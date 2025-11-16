@@ -18,20 +18,19 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 export default {
-  name: "productZone",
+  name: 'productZone',
   setup: () => {
-    const product = ref<any[]>([]);
+    const product = ref<any[]>([])
 
     onMounted(async () => {
       try {
         //fetch product ทั้งหมดออกมา
         const productfetch = await axios.get('http://localhost:3000/product')
-        console.log(productfetch);
+        console.log(productfetch)
 
-        product.value = productfetch.data;
-
+        product.value = productfetch.data
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
     })
 
@@ -60,6 +59,5 @@ export default {
 }
 
 .name {
-
 }
 </style>
