@@ -3,6 +3,11 @@
     <!-- แสดงรายการ product -->
     <div v-for="p in product" :key="p._id" class="allProduct" @click="selectedItem(p._id)">
       <p class="name">{{ p.productname }}</p>
+      <img
+        :src="'http://localhost:3000' + p.image"
+        alt="Product Image"
+        style="max-width: 300px; height: auto"
+      />
       <div v-if="selectItem == p._id" class="productDetails">
         <p class="name">{{ p.description }}</p>
         <p class="name">{{ p.quantity }}</p>
@@ -11,8 +16,10 @@
         <p class="name">{{ p.image }}</p>
         <p class="name">{{ p.catalog }}</p>
         <p class="name">{{ p.ownerID }}</p>
+        <router-link to="/editProduct"
+          ><button @click="editProduct(p._id.toString())">แก้ไขข้อมูล</button></router-link
+        >
       </div>
-      <button @click="editProduct(p._id.toString())"></button>
     </div>
   </div>
 </template>
@@ -20,7 +27,7 @@
 <script lang="ts" >
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useProductIDStore } from '@/stores/counter';
+import { useProductIDStore } from '@/stores/counter'
 export default {
   name: 'productZone',
   setup: () => {
@@ -43,14 +50,15 @@ export default {
 
     const selectedItem = (p: any) => {
       if (selectItem.value && selectItem.value === p) {
-    selectItem.value = null; // ปิดรายละเอียด
-  } else {
-    selectItem.value = p; // เปิดรายละเอียด
-  }
+        selectItem.value = null // ปิดรายละเอียด
+      } else {
+        selectItem.value = p // เปิดรายละเอียด
+      }
     }
 
-    const editProduct = (product: string) => {
-      productStore.setProductID(product);
+    const editProduct = async(product: string) => {
+      productStore.setProductID(product)
+      console.log('main',productStore.currentProductID);
     }
 
     return {
