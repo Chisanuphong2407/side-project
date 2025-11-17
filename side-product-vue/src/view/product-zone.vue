@@ -12,6 +12,7 @@
         <p class="name">{{ p.catalog }}</p>
         <p class="name">{{ p.ownerID }}</p>
       </div>
+      <button @click="editProduct(p._id.toString())"></button>
     </div>
   </div>
 </template>
@@ -19,10 +20,12 @@
 <script lang="ts" >
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useProductIDStore } from '@/stores/counter';
 export default {
   name: 'productZone',
   setup: () => {
     const product = ref<any[]>([])
+    const productStore = useProductIDStore();
 
     onMounted(async () => {
       try {
@@ -46,10 +49,15 @@ export default {
   }
     }
 
+    const editProduct = (product: string) => {
+      productStore.setProductID(product);
+    }
+
     return {
       product,
       selectItem,
       selectedItem,
+      editProduct,
     }
   },
 }

@@ -4,9 +4,8 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  logger: ['log', 'error', 'warn', 'debug', 'verbose'], 
-});
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
   app.enableCors({
     origin: 'http://localhost:5173',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

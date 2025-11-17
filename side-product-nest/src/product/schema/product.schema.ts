@@ -20,7 +20,7 @@ export class Product {
   @Prop()
   price: number;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   image: string;
 
   @Prop({ type: String, required: true })

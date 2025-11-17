@@ -8,10 +8,8 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
   BadRequestException,
-  Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,25 +23,24 @@ export class ProductController {
   @Post()
   //ใช้ FileInterceptor: 'image' คือชื่อฟิลด์ของไฟล์
   @UseInterceptors(FileInterceptor('image'))
-  @UsePipes(new ValidationPipe({ transform: true }))
   async create(
     @Body() createProductDto: CreateProductDto,
     // ดักจับไฟล์ที่อัปโหลด
     @UploadedFile() file: Express.Multer.File,
   ) {
-    if (file) {
-      const logger = new Logger('controller');
-      try {
-        const imageUrl: string = await this.productService.saveImage(file);
-        createProductDto.image = imageUrl;
-        logger.log(createProductDto)
-      } catch (error) {
-        throw new BadRequestException("image error")
-      }
-    } else {
+    if (!file) {
       throw new BadRequestException('Image file is required.');
     }
-    return this.productService.create(createProductDto);
+    try {
+      const imageUrl: string = await this.productService.saveImage(file);
+      createProductDto.image = imageUrl;
+
+      //บันทึก DTO ที่มี URL แล้ว
+      return this.productService.create(createProductDto);
+    } catch (error) {
+      console.error('Error in save/create:', error);
+      throw new InternalServerErrorException('Failed to process/save product.');
+    }
   }
 
   @Get()

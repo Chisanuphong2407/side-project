@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import productZone from '@/view/product-zone.vue'
 import addProduct from '@/view/add-product.vue'
+import addCatalog from '@/view/add-catalog.vue'
 
 // const router = createRouter({
 //   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,6 +11,7 @@ import addProduct from '@/view/add-product.vue'
 const routes = [
   { path: '/', name: 'productZone', component: productZone },
   { path: '/addProduct', name: 'addProduct', component: addProduct },
+  { path: '/addCatalog', name: 'addCatalog', component: addCatalog },
   { path: '/:catchAll(.*)', component: productZone },
 ]
 

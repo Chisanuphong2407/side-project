@@ -4,6 +4,7 @@
       <div class="sidebar-header">Navigator</div>
       <nav class="navigator">
         <router-link to="/" class="nav-item">สินค้าทั้งหมด</router-link>
+        <router-link to="/addCatalog" class="nav-item">เพิ่มหมวดหมู่</router-link>
         <router-link to="/addProduct" class="nav-item">เพิ่มสินค้า</router-link>
       </nav>
     </aside>

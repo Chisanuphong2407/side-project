@@ -26,6 +26,7 @@
         type="number"
         placeholder="จำนวนสินค้า"
         v-model="product.quantity"
+        min="1"
         required
       />
 
@@ -90,9 +91,9 @@ export default {
     const product = ref({
       productname: '',
       description: '',
-      quantity: 0,
+      quantity: 1,
       unit: '',
-      price: 0,
+      price: 1,
       image: '',
       catalog: '',
       ownerID: '123456789012348576849587',
@@ -110,6 +111,7 @@ export default {
       const input = event.target as HTMLInputElement
       // ต้องแน่ใจว่าใช้ .files[0]
       const file = input.files ? input.files[0] : null //ดึงไฟล์แรกที่ถูกเลือก
+
       if (file) {
         selectFile.value = file
         previewPath.value = URL.createObjectURL(file)
@@ -127,36 +129,32 @@ export default {
       }
     }
 
-    const submitProduct = async (): Promise<any> => {
-      try {
-        isloading.value = true
+    const submitProduct = async () => {
+      isloading.value = true
 
+      if (!selectFile.value) {
+        alert('กรุณาเลือกรูปภาพสินค้า!')
+        isloading.value = false
+        return
+      }
+      try {
         // สร้าง FormData Object สำหรับส่งทั้งข้อมูลและไฟล์
-        const formData = new FormData()
+        const formData = new FormData();
+
         formData.append('productname', product.value.productname)
         formData.append('description', product.value.description)
         formData.append('quantity', product.value.quantity.toString())
         formData.append('unit', product.value.unit)
         formData.append('price', product.value.price.toString())
-
-        if (selectFile.value) {
-          formData.append('image', selectFile.value) // ✅ เพิ่มไฟล์รูปภาพ
-        }else{
-          alert('false')
-          return false;
-        }
+        formData.append('image', selectFile.value);
 
         formData.append('catalog', product.value.catalog)
         formData.append('ownerID', product.value.ownerID)
 
-
         // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
         //    (Axios จะจัดการให้เองถ้าเป็น FormData)
-        const response = await axios.post('http://localhost:3000/product', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+        const response = await axios.post('http://localhost:3000/product', formData );
+        alert('บันทึกสินค้าสำเร็จ!');
 
         removeImage()
         product.value = {
@@ -189,12 +187,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .add-product {
   display: flex;
   flex-direction: column;
   background-color: aliceblue;
-  justify-content: center;
+  align-content: center;
   align-items: center;
 }
 
