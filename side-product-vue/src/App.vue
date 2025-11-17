@@ -1,13 +1,39 @@
 <template>
-  <div>
-    <productHeader />
-    <productZone />
+  <div class="container">
+    <productHeader class="header" />
+    <navigator class="nav"/>
+    <content class="content"/>
   </div>
 </template>
 
 <script lang="ts" setup>
 import productHeader from './components/product-header.vue'
-import productZone from './components/product-zone.vue'
+import content from './components/content.vue';
+import navigator from './components/navigator.vue'
 </script>
+
 <style scoped>
+.container {
+  height: 100vh;
+  max-width: 100vw;
+  display: grid;
+  grid-template-columns: 10vw 1fr;
+  grid-template-rows: 15vh 1fr;
+  grid-template-areas: 
+  'header header'
+  'nav main';
+}
+
+.header {
+  grid-area: header;
+}
+
+.content {
+  grid-area: main;
+}
+
+.nav {
+  grid: nav;
+}
+
 </style>

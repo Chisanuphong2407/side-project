@@ -20,7 +20,6 @@ export default {}
   background-color: antiquewhite;
   width: 100vw;
   text-align: center;
-  padding: 0.5%;
   font-size: 3vh;
 }
 </style>

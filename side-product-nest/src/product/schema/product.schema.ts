@@ -23,7 +23,7 @@ export class Product {
   @Prop()
   image: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   catalog: string;
 
   @Prop()
