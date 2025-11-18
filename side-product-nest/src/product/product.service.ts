@@ -27,8 +27,14 @@ export class ProductService {
     return data;
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product | null> {
+    const data = this.productModel
+      .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .exec();
+    return data;
   }
 
   remove(id: string) {
