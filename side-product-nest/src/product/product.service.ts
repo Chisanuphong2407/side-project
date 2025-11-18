@@ -20,12 +20,22 @@ export class ProductService {
     return data.save();
   }
 
+  async saveImage(file: Express.Multer.File): Promise<string> {
+    const uploadDir = './uploads';
+    await fs.mkdir(uploadDir, { recursive: true }); // สร้างโฟลเดอร์หากยังไม่มี
+    const fileName = `${Date.now()}-${file.originalname} `; // ตั้งชื่อไฟล์
+    const filePath = `${uploadDir}/${fileName}`;
+
+    await fs.writeFile(filePath, file.buffer); // บันทึกไฟล์ลงดิสก์
+    return `/uploads/${fileName}`;
+  }
+
   async findAll(): Promise<Product[]> {
     return this.productModel.find().exec();
   }
 
-  async findOne(id: string) {
-    return this.productModel.findById(id).exec();
+  findOne(id: number) {
+    return `This action returns a #${id} product`;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {

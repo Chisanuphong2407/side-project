@@ -5,7 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  
   app.enableCors({
     origin: 'http://localhost:5173',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -14,8 +14,7 @@ async function bootstrap() {
 
   // กำหนดโฟลเดอร์ 'uploads' เป็น Static Files
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // URL prefix ที่จะเข้าถึงไฟล์ เช่น /uploads/my-image.png,
-    extensions: ['jpg', 'jpeg', 'png', 'gif'],
+    prefix: '/uploads/', // URL prefix ที่จะเข้าถึงไฟล์ เช่น /uploads/my-image.png
   });
 
   await app.listen(process.env.PORT ?? 3000);
