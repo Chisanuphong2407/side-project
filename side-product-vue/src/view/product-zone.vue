@@ -8,11 +8,10 @@
         <p class="name">{{ p.quantity }}</p>
         <p class="name">{{ p.unit }}</p>
         <p class="name">{{ p.price }}</p>
-        <p class="name">{{ p.image }}</p>
         <p class="name">{{ p.catalog }}</p>
         <p class="name">{{ p.ownerID }}</p>
+        <button @click="editProduct(p._id.toString())"></button>
       </div>
-      <button @click="editProduct(p._id.toString())"></button>
     </div>
   </div>
 </template>
