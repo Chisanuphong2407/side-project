@@ -31,13 +31,10 @@
       />
 
       <label for="product-unit">หน่วย</label>
-      <input
-        id="product-unit"
-        type="text"
-        placeholder="เช่น ชิ้น ใบ ฯลฯ"
-        v-model="product.unit"
-        required
-      />
+      <select id="product-unit" v-model="product.unit">
+        <option disabled value="" selected>--หน่วย--</option>
+        <option v-for="u in allUnit" :key="u._id">{{ u.unitname }}</option>
+      </select>
 
       <label for="product-price">ราคา (บาท)</label>
       <input
@@ -62,14 +59,11 @@
         />
       </div>
 
-      <label for="product-catalog">หมวดหมู่</label>
-      <input
-        id="product-catalog"
-        type="text"
-        placeholder="หมวดหมู่"
-        v-model="product.catalog"
-        required
-      />
+      <label for="product-unit">หมวดหมู่</label>
+      <select id="product-unit" v-model="product.catalog">
+        <option disabled value="" selected>--หมวดหมู่--</option>
+        <option v-for="c in allCatalog" :key="c._id">{{ c.catalogName }}</option>
+      </select>
       <button type="submit" class="submit-button" :disabled="isloading">
         {{ isloading ? 'กำลังบันทึก' : 'บันทึก' }}
       </button>
@@ -78,8 +72,9 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
 import { ref } from 'vue'
+import axios from 'axios'
+import { onMounted } from 'vue'
 export default {
   name: 'addProduct',
   setup: () => {
@@ -87,7 +82,8 @@ export default {
     const previewPath = ref<string | null>(null)
     const isloading = ref<boolean>(false)
     const isSuccess = ref<boolean>(false)
-
+    const allUnit = ref()
+    const allCatalog = ref()
     const product = ref({
       productname: '',
       description: '',
@@ -97,6 +93,18 @@ export default {
       image: '',
       catalog: '',
       ownerID: '123456789012348576849587',
+    })
+
+    onMounted(async () => {
+      try {
+        const unitData = await axios.get('http://localhost:3000/unit')
+        allUnit.value = unitData.data
+
+        const catalogData = await axios.get('http://localhost:3000/catalog')
+        allCatalog.value = catalogData.data
+      } catch (error) {
+        console.log(error)
+      }
     })
 
     //เก็บ fileInput โดยตรง
@@ -139,22 +147,22 @@ export default {
       }
       try {
         // สร้าง FormData Object สำหรับส่งทั้งข้อมูลและไฟล์
-        const formData = new FormData();
+        const formData = new FormData()
 
         formData.append('productname', product.value.productname)
         formData.append('description', product.value.description)
         formData.append('quantity', product.value.quantity.toString())
         formData.append('unit', product.value.unit)
         formData.append('price', product.value.price.toString())
-        formData.append('image', selectFile.value);
+        formData.append('image', selectFile.value)
 
         formData.append('catalog', product.value.catalog)
         formData.append('ownerID', product.value.ownerID)
 
         // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
         //    (Axios จะจัดการให้เองถ้าเป็น FormData)
-        const response = await axios.post('http://localhost:3000/product', formData );
-        alert('บันทึกสินค้าสำเร็จ!');
+        await axios.post('http://localhost:3000/product', formData)
+        alert('บันทึกสินค้าสำเร็จ!')
 
         removeImage()
         product.value = {
@@ -182,6 +190,8 @@ export default {
       fileHandle,
       fileInput,
       previewPath,
+      allUnit,
+      allCatalog,
     }
   },
 }

@@ -21,19 +21,38 @@
 
 <script lang="ts">
 import { ref } from 'vue'
+import axios from 'axios'
 export default {
-  name: 'Catalog',
+  name: 'addCatalog',
   setup: () => {
     const catalog = ref<string>('')
     const unit = ref<string>('')
     const isLoading = ref(false)
 
-    const submitCatalog = () => {
-        const isEmpty = (catalog.value.trim() == '') && (unit.value.trim() == '') ;
+    const submitCatalog = async () => {
+      const isEmpty = catalog.value.trim() == '' && unit.value.trim() == ''
       if (!isEmpty) {
         isLoading.value = true
         try {
-        } catch (error) {}
+          if (unit.value != '' && catalog.value != '') {
+            await axios.post('http://localhost:3000/unit', {unitname: unit.value})
+            await axios.post('http://localhost:3000/catalog',{catalogName: catalog.value})
+            alert('บันทึกหมวดหมู่และหน่วยสำเร็จ')
+            isLoading.value = false
+          } else if (unit.value !== '') {
+            // formUnit.append('unitname', unit.value)
+            await axios.post('http://localhost:3000/unit', {unitname: unit.value})
+            alert('เพิ่มหน่วยสำเร็จ')
+            isLoading.value = false
+          } else if (catalog.value != '') {
+            await axios.post('http://localhost:3000/catalog',{catalogName: catalog.value})
+            alert('เพิ่มหมวดหมู่สำเร็จ')
+            isLoading.value = false
+          }
+        } catch (error) {
+          alert('เพิ่มข้อมูลไม่สำเร็จ')
+          console.log(error)
+        }
       } else {
         alert(' กรุณากรอกข้อมูล')
         isLoading.value = false

@@ -10,7 +10,13 @@
         <p class="name">{{ p.price }}</p>
         <p class="name">{{ p.catalog }}</p>
         <p class="name">{{ p.ownerID }}</p>
-        <button @click="editProduct(p._id.toString())"></button>
+        <img
+          :src="'http://localhost:3000' + p.image"
+          alt="Product Image"
+          style="max-width: auto; height: 300px; object-fit: contain;"
+          class="product-image"
+        />
+        <button class="edit-button" @click="editProduct(p._id.toString())">แก้ไข</button>
       </div>
     </div>
   </div>
@@ -20,11 +26,13 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useProductIDStore } from '@/stores/counter';
+import { useRouter } from 'vue-router';
 export default {
   name: 'productZone',
   setup: () => {
     const product = ref<any[]>([])
-    const productStore = useProductIDStore();
+    const productStore = useProductIDStore()
+    const router = useRouter();
 
     onMounted(async () => {
       try {
@@ -42,14 +50,15 @@ export default {
 
     const selectedItem = (p: any) => {
       if (selectItem.value && selectItem.value === p) {
-    selectItem.value = null; // ปิดรายละเอียด
-  } else {
-    selectItem.value = p; // เปิดรายละเอียด
-  }
+        selectItem.value = null // ปิดรายละเอียด
+      } else {
+        selectItem.value = p // เปิดรายละเอียด
+      }
     }
 
     const editProduct = (product: string) => {
       productStore.setProductID(product);
+      router.push("/editProduct");
     }
 
     return {
@@ -77,9 +86,17 @@ export default {
 }
 
 .productDetails {
+  display: flex;
+  flex-direction: column;
   background-color: rgb(192, 148, 148);
 }
 .name {
   margin: 3px;
+}
+
+.edit-button {
+  margin: 5px;
+  width: fit-content;
+  padding-block: 3px;
 }
 </style>
