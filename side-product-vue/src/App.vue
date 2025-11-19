@@ -1,24 +1,34 @@
-<template>
-  <div class="container">
-    <div v-if="false">
+  <template>
+  <div>
+    <div class="container" v-if="login">
       <productHeader class="header" />
       <navigator class="nav" />
       <content class="content" />
     </div>
     <div v-else>
-      <login />
+      <content />
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
+  <script lang="ts" setup>
 import productHeader from './components/product-header.vue'
 import content from './components/content.vue'
 import navigator from './components/navigator.vue'
-import login from './components/login.vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const login = ref<boolean>(false)
+
+onMounted(() => {
+  if (login.value == false) {
+    router.replace('/loginForm');
+  }
+})
 </script>
 
-<style scoped>
+  <style scoped>
 .container {
   height: 100vh;
   max-width: 100vw;

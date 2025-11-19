@@ -7,20 +7,38 @@
     <div class="login-content">
       <form>
         <label for="username">username: </label>
-        <input id="username"/>
+        <input id="username" v-model="username"/>
 
         <label for="password">password: </label>
-        <input id="password" type="password" />
+        <input id="password" type="password" v-model="password"/>
       </form>
     </div>
     <button type="submit">เข้าสู่ระบบ</button>
     <p>หรือ</p>
-    <a class="register">สมัครสมาชิก</a>
+    <a class="register" @click="register">สมัครสมาชิก</a>
   </div>
 </template>
 
 <script lang="ts">
-export default {}
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+export default {
+  name:'loginForm',
+  setup: () => {
+    const username = ref<string>()
+    const password = ref<string>()
+    const router = useRouter();
+
+    const register = () => {
+      router.push('/registerForm')
+    }
+    return {
+      username,
+      password,
+      register,
+    }
+  }
+}
 </script>
 
 <style>
