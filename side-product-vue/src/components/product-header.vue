@@ -6,9 +6,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {}
-// import { ref } from 'vue';
+<script lang="ts" setup>
 </script>
 
 <style>

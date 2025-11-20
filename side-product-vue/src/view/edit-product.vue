@@ -68,103 +68,97 @@
   </div>
 </template>
 
-<script lang="ts">
-import { onMounted, ref, unref, toRaw } from 'vue'
+<script setup lang="ts">
+import { onMounted, ref, toRaw, unref } from 'vue'
 import { useProductIDStore } from '@/stores/counter'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-export default {
-  name: 'editProduct',
-  setup: () => {
-    const product = ref()
-    const productStore = useProductIDStore()
-    const isloading = ref<boolean>(false)
-    const allUnit = ref()
-    const allCatalog = ref()
-    const previewPath = ref<string | null>(null)
-    const productID = productStore.currentProductID
-    const router = useRouter();
 
-    onMounted(async () => {
-      console.log(productID)
-      try {
-        const productData = await axios.get(`http://localhost:3000/product/${productID}`)
-        console.log(productData.data)
-        product.value = productData.data
+// กำหนดชื่อ Component (Optional: จำเป็นถ้าใช้ KeepAlive หรืออยากเห็นชื่อใน DevTools)
+defineOptions({
+  name: 'editProduct'
+})
 
-        const unitData = await axios.get('http://localhost:3000/unit')
-        allUnit.value = unitData.data
+const productStore = useProductIDStore()
+const router = useRouter()
+const productID = productStore.currentProductID
 
-        const catalogData = await axios.get('http://localhost:3000/catalog')
-        allCatalog.value = catalogData.data
+// State
+const product = ref()
+const isloading = ref<boolean>(false)
+const allUnit = ref()
+const allCatalog = ref()
+const previewPath = ref<string | null>(null)
 
-        //+ http เพื่อให้ตาม path ได้
-        previewPath.value = `http://localhost:3000${productData.data.image}`
-      } catch (error) {
-        alert('error')
-        console.log(error)
-      }
-    })
+// File Refs
+const fileInput = ref<HTMLInputElement | null>(null)
+const selectFile = ref<File | null>(null)
 
-    //เก็บ fileInput โดยตรง
-    const fileInput = ref<HTMLInputElement | null>(null)
+onMounted(async () => {
+  console.log(productID)
+  try {
+    const productData = await axios.get(`${URL}/product/${productID}`)
+    console.log(productData.data)
+    product.value = productData.data
 
-    //เก็บ OBJ file ที่เลือก
-    const selectFile = ref<File | null>(null)
+    const unitData = await axios.get(`${URL}/unit`)
+    allUnit.value = unitData.data
 
-    //@change activate
-    const fileHandle = (event: Event) => {
-      // ดึง Event.target มาเป็น HTMLInputElement เพื่อช่วย TypeScript
-      const input = event.target as HTMLInputElement
-      // ต้องแน่ใจว่าใช้ .files[0]
-      const file = input.files ? input.files[0] : null //ดึงไฟล์แรกที่ถูกเลือก
+    const catalogData = await axios.get(`${URL}/catalog`)
+    allCatalog.value = catalogData.data
 
-      if (file) {
-        selectFile.value = file
-        previewPath.value = URL.createObjectURL(file)
-        console.log(selectFile)
-      } else {
-        removeImage()
-      }
-    }
+    //+ http เพื่อให้ตาม path ได้
+    previewPath.value = `${URL}${productData.data.image}`
+  } catch (error) {
+    alert('error')
+    console.log(error)
+  }
+})
 
-    const removeImage = () => {
-      selectFile.value = null
-      previewPath.value = null
-      if (fileInput.value) {
-        fileInput.value.value = ''
-      }
-    }
+const removeImage = () => {
+  selectFile.value = null
+  previewPath.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
 
-    const submitProduct = async () => {
-      isloading.value = true
-      delete product.value._id
-      const raw = unref(product)
+//@change activate
+const fileHandle = (event: Event) => {
+  // ดึง Event.target มาเป็น HTMLInputElement เพื่อช่วย TypeScript
+  const input = event.target as HTMLInputElement
+  // ต้องแน่ใจว่าใช้ .files[0]
+  const file = input.files ? input.files[0] : null //ดึงไฟล์แรกที่ถูกเลือก
 
-      const sendData = toRaw(raw)
-      console.log(sendData);
-      try {
-        await axios.patch(`http://localhost:3000/product/${productID}`, sendData)
-        isloading.value = false
-        router.push('/');
-        alert('อัพเดตสำเร็จ')
-      } catch (error) {
-        alert(error)
-      }
-    }
+  if (file) {
+    selectFile.value = file
+    previewPath.value = URL.createObjectURL(file)
+    console.log(selectFile)
+  } else {
+    removeImage()
+  }
+}
 
-    return {
-      product,
-      isloading,
-      allUnit,
-      allCatalog,
-      fileInput,
-      selectFile,
-      fileHandle,
-      previewPath,
-      submitProduct,
-    }
-  },
+const submitProduct = async () => {
+  isloading.value = true
+  // Note: การลบ property ออกจาก ref โดยตรง
+  if (product.value && product.value._id) {
+     delete product.value._id
+  }
+
+  const raw = unref(product)
+  const sendData = toRaw(raw)
+  console.log(sendData);
+
+  try {
+    await axios.patch(`${URL}/product/${productID}`, sendData)
+    isloading.value = false
+    router.push('/');
+    alert('อัพเดตสำเร็จ')
+  } catch (error) {
+    alert(error)
+    isloading.value = false // ควรปิด loading กรณี error ด้วย
+  }
 }
 </script>
 

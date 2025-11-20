@@ -20,7 +20,7 @@ import { extname } from 'path'; // 💡 ต้อง Import ตัวนี้
 
 // ฟังก์ชันสำหรับตั้งชื่อไฟล์ที่ไม่ซ้ำกัน
 const editFileName = (req, file, callback) => {
-  const name = file.originalname.split('.')[0];
+  const name: string = file.originalname.split('.')[0];
   const fileExtName = extname(file.originalname);
   const randomName = Array(4)
     .fill(null)

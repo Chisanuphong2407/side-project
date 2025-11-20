@@ -19,12 +19,13 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-export default {
-  name:'loginForm',
-  setup: () => {
+
+defineOptions({
+  name:'loginForm'
+})
     const username = ref<string>()
     const password = ref<string>()
     const router = useRouter();
@@ -32,13 +33,6 @@ export default {
     const register = () => {
       router.push('/registerForm')
     }
-    return {
-      username,
-      password,
-      register,
-    }
-  }
-}
 </script>
 
 <style>

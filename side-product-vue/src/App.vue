@@ -19,7 +19,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const login = ref<boolean>(false)
+const login = ref<boolean>(true)
 
 onMounted(() => {
   if (login.value == false) {

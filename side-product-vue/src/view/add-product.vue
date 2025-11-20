@@ -31,7 +31,7 @@
       />
 
       <label for="product-unit">หน่วย</label>
-      <select id="product-unit" v-model="product.unit">
+      <select id="product-unit" v-model="product.unit" required>
         <option disabled value="" selected>--หน่วย--</option>
         <option v-for="u in allUnit" :key="u._id">{{ u.unitname }}</option>
       </select>
@@ -60,7 +60,7 @@
       </div>
 
       <label for="product-unit">หมวดหมู่</label>
-      <select id="product-unit" v-model="product.catalog">
+      <select id="product-unit" v-model="product.catalog" required>
         <option disabled value="" selected>--หมวดหมู่--</option>
         <option v-for="c in allCatalog" :key="c._id">{{ c.catalogName }}</option>
       </select>
@@ -82,6 +82,8 @@ export default {
     const previewPath = ref<string | null>(null)
     const isloading = ref<boolean>(false)
     const isSuccess = ref<boolean>(false)
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
     const allUnit = ref()
     const allCatalog = ref()
     const product = ref({
@@ -97,10 +99,10 @@ export default {
 
     onMounted(async () => {
       try {
-        const unitData = await axios.get('http://localhost:3000/unit')
+        const unitData = await axios.get(`${BASE_URL}/unit`)
         allUnit.value = unitData.data
 
-        const catalogData = await axios.get('http://localhost:3000/catalog')
+        const catalogData = await axios.get(`${BASE_URL}/catalog`)
         allCatalog.value = catalogData.data
       } catch (error) {
         console.log(error)
@@ -161,7 +163,7 @@ export default {
 
         // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
         //    (Axios จะจัดการให้เองถ้าเป็น FormData)
-        await axios.post('http://localhost:3000/product', formData)
+        await axios.post(`${BASE_URL}/product`, formData)
         alert('บันทึกสินค้าสำเร็จ!')
 
         removeImage()
@@ -178,6 +180,7 @@ export default {
         isSuccess.value = true
       } catch (error) {
         console.log(error)
+        alert('เพิ่มข้อมูลไม่สำเร็จ');
       } finally {
         isloading.value = false
       }

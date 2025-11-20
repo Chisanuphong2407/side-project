@@ -37,7 +37,7 @@ export class ProductService {
     return data;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    return this.productModel.findByIdAndDelete(id).exec();
   }
 }

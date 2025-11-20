@@ -4,7 +4,7 @@
       <h1>Register</h1>
     </div>
     <div class="register-content">
-      <form @submit.prevent="onSubmitRegister">
+      <form @submit.prevent="onSubmitRegister(email?? '', username?? '')">
         <label for="firstname">ชื่อ: </label>
         <input id="firstname" v-model="firstname" />
 
@@ -31,52 +31,76 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/firebase/index'
 
-export default {
+defineOptions({
   name: 'registerForm',
-  setup: () => {
-    const firstname = ref<string>()
-    const lastname = ref<string>()
-    const email = ref<string>()
-    const phone = ref<string>()
-    const username = ref<string>()
-    const password = ref<string>()
-    const confirmPassword = ref<string>()
+})
+const firstname = ref<string>()
+const lastname = ref<string>()
+const email = ref<string>()
+const phone = ref<string>()
+const username = ref<string>()
+const password = ref<string>()
+const confirmPassword = ref<string>()
 
-    const onSubmitRegister = () => {
-      const data = [
-        firstname.value,
-        lastname.value,
-        email.value,
-        phone.value,
-        username.value,
-        password.value,
-      ]
+const onSubmitRegister = async (email: string , username: string ) => {
+  // const data = [
+  //   firstname.value,
+  //   lastname.value,
+  //   email.value,
+  //   phone.value,
+  //   username.value,
+  //   password.value,
+  // ]
 
-      const topic: string[] = ['firstname', 'lastname', 'email', 'phone', 'username', 'password']
-      const registerForm = new FormData()
+  // const topic: string[] = ['firstname', 'lastname', 'email', 'phone', 'username', 'password']
+  // const registerForm = new FormData()
 
-      data.forEach((data, index) => {
-        const key = (topic[index] || '').toString()
-        const value = (data || '').toString();
-        registerForm.append(key, value);
+  // data.forEach((data, index) => {
+  //   const key = (topic[index] || '').toString()
+  //   const value = (data || '').toString();
+  //   registerForm.append(key, value);
 
-        console.log(registerForm.get(key));
-      })
-    }
-    return {
-      firstname,
-      lastname,
-      email,
-      phone,
-      username,
-      password,
-      confirmPassword,
-      onSubmitRegister,
-    }
-  },
+  //   console.log(registerForm.get(key));
+  // })
+
+  try {
+    //1. สร้าง account ใน firebase
+    const userCredential = await createUserWithEmailAndPassword(auth, username, email);
+
+    //userCredential กลายเป็น OBJ
+    //เก็บข้อมูลทั้งหมดของ account ที่พึ่งสร้าง
+    const user = userCredential.user;
+    //user เก็บ uid ไว้
+    const uid = user.uid;
+
+    //2. เก็บข้อมูล user เข้า db
+    //doc(database,ชื่อ collection,ชื่อ doc)
+    //ไปที่ Database (db) -> คอลเลกชัน "users" -> สร้างเอกสารชื่อ "myUid"
+    const userRef = doc(db, "User", uid);
+
+    // คำสั่ง setDoc() คือการเขียนข้อมูลลงไปในตำแหน่งที่ระบุไว้
+    await setDoc(userRef, {
+      uid: uid,              // เก็บ uid ไว้อีกทีเพื่อความชัวร์
+      email: email,            // เก็บอีเมล
+      firstName: firstname,      // ข้อมูลพิเศษที่เราอยากเก็บ
+      lastName: lastname,      // ข้อมูลพิเศษที่เราอยากเก็บ
+      phone: phone, // ข้อมูลพิเศษ
+      createdAt: new Date()    // เก็บเวลาที่สมัคร
+    });
+
+    console.log("สำเร็จ! สร้าง User พร้อมเก็บข้อมูลเรียบร้อย");
+  } catch (error) {
+    alert("สมัครไม่สำเร็จ")
+    console.log(error);
+  }
+
+
 }
 </script>
 

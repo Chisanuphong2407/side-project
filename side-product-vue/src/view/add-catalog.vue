@@ -28,6 +28,7 @@ export default {
     const catalog = ref<string>('')
     const unit = ref<string>('')
     const isLoading = ref(false)
+    const URL = import.meta.env.VITE_API_BASE_URL
 
     const submitCatalog = async () => {
       const isEmpty = catalog.value.trim() == '' && unit.value.trim() == ''
@@ -35,23 +36,27 @@ export default {
         isLoading.value = true
         try {
           if (unit.value != '' && catalog.value != '') {
-            await axios.post('http://localhost:3000/unit', {unitname: unit.value})
-            await axios.post('http://localhost:3000/catalog',{catalogName: catalog.value})
+            await axios.post(`${URL}/unit`, {unitname: unit.value})
+            await axios.post(`${URL}/catalog`,{catalogName: catalog.value})
             alert('บันทึกหมวดหมู่และหน่วยสำเร็จ')
             isLoading.value = false
           } else if (unit.value !== '') {
             // formUnit.append('unitname', unit.value)
-            await axios.post('http://localhost:3000/unit', {unitname: unit.value})
+            await axios.post(`${URL}/unit`, {unitname: unit.value})
             alert('เพิ่มหน่วยสำเร็จ')
             isLoading.value = false
           } else if (catalog.value != '') {
-            await axios.post('http://localhost:3000/catalog',{catalogName: catalog.value})
+            await axios.post(`${URL}/catalog`,{catalogName: catalog.value})
             alert('เพิ่มหมวดหมู่สำเร็จ')
             isLoading.value = false
           }
         } catch (error) {
           alert('เพิ่มข้อมูลไม่สำเร็จ')
           console.log(error)
+        }finally{
+          //clear input
+          unit.value = ''
+          catalog.value = ''
         }
       } else {
         alert(' กรุณากรอกข้อมูล')
