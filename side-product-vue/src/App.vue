@@ -17,12 +17,14 @@ import content from './components/content.vue'
 import navigator from './components/navigator.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserNameStore } from './stores/counter'
 
 const router = useRouter()
-const login = ref<boolean>(true)
+const login = ref<boolean>(false)
+const userName = useUserNameStore();
 
 onMounted(() => {
-  if (login.value == false) {
+  if (userName) {
     router.replace('/loginForm');
   }
 })

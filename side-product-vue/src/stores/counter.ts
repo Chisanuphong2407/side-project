@@ -12,14 +12,14 @@ export const useCounterStore = defineStore('counter', () => {
 })
 
 export const useProductIDStore = defineStore('id', () => {
-  const currentProductID = ref<string>();
+  const currentProductID = ref<string>()
 
   const setProductID = (id: string) => {
     currentProductID.value = id
   }
 
   const resetProductID = () => {
-    currentProductID.value = '';
+    currentProductID.value = ''
   }
 
   return {
@@ -27,4 +27,24 @@ export const useProductIDStore = defineStore('id', () => {
     setProductID,
     resetProductID,
   }
+})
+
+export const useUserUIDStore = defineStore('uid', () => {
+  const currentUid = ref<string>()
+
+  const setUid = (uid: string) => {
+    currentUid.value = uid
+  }
+
+  return { currentUid, setUid }
+})
+
+export const useUserNameStore = defineStore('username', () => {
+  const currentUsername = ref<string>()
+
+  const setUsername = (username: string) => {
+    currentUsername.value = username
+  }
+
+  return { currentUsername, setUsername }
 })

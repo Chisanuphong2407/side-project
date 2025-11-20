@@ -7,13 +7,13 @@
     <div class="login-content">
       <form>
         <label for="username">username: </label>
-        <input id="username" v-model="username"/>
+        <input id="username" v-model="username" required />
 
         <label for="password">password: </label>
-        <input id="password" type="password" v-model="password"/>
+        <input id="password" type="password" v-model="password" required />
       </form>
     </div>
-    <button type="submit">เข้าสู่ระบบ</button>
+    <button type="submit" @click="onLogin(username || '', password || '')">เข้าสู่ระบบ</button>
     <p>หรือ</p>
     <a class="register" @click="register">สมัครสมาชิก</a>
   </div>
@@ -22,17 +22,38 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/firebase';
+import { useUserNameStore } from '@/stores/counter';
 
 defineOptions({
-  name:'loginForm'
+  name: 'loginForm'
 })
-    const username = ref<string>()
-    const password = ref<string>()
-    const router = useRouter();
+const username = ref<string>()
+const password = ref<string>()
+const router = useRouter();
 
-    const register = () => {
-      router.push('/registerForm')
-    }
+const loginUser = useUserNameStore();
+
+const onLogin = async (username: string, password: string) => {
+  try {
+    const LoginDredential = await signInWithEmailAndPassword(auth, username, password);
+
+    const user = LoginDredential.user;
+    loginUser.setUsername(<string>user.displayName)
+    console.log(loginUser)
+
+  } catch (error) {
+    alert('เข้าสู่ระบบไม่สำเร็จ')
+    console.log(error);
+  }
+
+
+
+}
+const register = () => {
+  router.push('/registerForm')
+}
 </script>
 
 <style>

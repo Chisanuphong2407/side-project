@@ -4,27 +4,27 @@
       <h1>Register</h1>
     </div>
     <div class="register-content">
-      <form @submit.prevent="onSubmitRegister(email?? '', username?? '')">
+      <form @submit.prevent="onSubmitRegister(email ?? '', password ?? '')">
         <label for="firstname">ชื่อ: </label>
-        <input id="firstname" v-model="firstname" />
+        <input id="firstname" v-model="firstname" required />
 
         <label for="lastname">นามสกุล: </label>
-        <input id="lastname" v-model="lastname" />
+        <input id="lastname" v-model="lastname" required />
 
         <label for="email">email: </label>
-        <input id="email" v-model="email" />
+        <input id="email" v-model="email" required />
 
         <label for="phone">โทรศัพท์: </label>
-        <input id="phone" v-model="phone" />
+        <input id="phone" v-model="phone" required />
 
         <label for="username">username: </label>
-        <input id="username" v-model="username" />
+        <input id="username" v-model="username" required />
 
         <label for="password">รหัสผ่าน: </label>
-        <input id="password" type="password" v-model="password" />
+        <input id="password" type="password" v-model="password" required />
 
         <label for="confirmPassword">ยืนยันรหัสผ่าน: </label>
-        <input id="confirmPassword" type="password" v-model="confirmPassword" />
+        <input id="confirmPassword" type="password" v-model="confirmPassword" required />
         <button type="submit">สมัครสมาชิก</button>
       </form>
     </div>
@@ -33,9 +33,10 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword ,updateProfile} from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/index'
+import axios from 'axios';
 
 defineOptions({
   name: 'registerForm',
@@ -47,8 +48,9 @@ const phone = ref<string>()
 const username = ref<string>()
 const password = ref<string>()
 const confirmPassword = ref<string>()
+const URL = import.meta.env.VITE_API_BASE_URL;
 
-const onSubmitRegister = async (email: string , username: string ) => {
+const onSubmitRegister = async (email: string, password: string) => {
   // const data = [
   //   firstname.value,
   //   lastname.value,
@@ -69,9 +71,15 @@ const onSubmitRegister = async (email: string , username: string ) => {
   //   console.log(registerForm.get(key));
   // })
 
+  if (password !== confirmPassword.value) {
+    alert("ยืนยันรหัสผ่านไม่สำเร็จ");
+    return false;
+  }
+
   try {
+    console.log(auth)
     //1. สร้าง account ใน firebase
-    const userCredential = await createUserWithEmailAndPassword(auth, username, email);
+    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
 
     //userCredential กลายเป็น OBJ
     //เก็บข้อมูลทั้งหมดของ account ที่พึ่งสร้าง
@@ -87,13 +95,18 @@ const onSubmitRegister = async (email: string , username: string ) => {
     // คำสั่ง setDoc() คือการเขียนข้อมูลลงไปในตำแหน่งที่ระบุไว้
     await setDoc(userRef, {
       uid: uid,              // เก็บ uid ไว้อีกทีเพื่อความชัวร์
-      email: email,            // เก็บอีเมล
-      firstName: firstname,      // ข้อมูลพิเศษที่เราอยากเก็บ
-      lastName: lastname,      // ข้อมูลพิเศษที่เราอยากเก็บ
-      phone: phone, // ข้อมูลพิเศษ
+      email: email,
+      username: username.value,
+      firstName: firstname.value,
+      lastName: lastname.value,
+      phone: phone.value,
       createdAt: new Date()    // เก็บเวลาที่สมัคร
     });
 
+    await axios.post(`${URL}/user`, {
+      uid: uid,
+      username: username.value
+    })
     console.log("สำเร็จ! สร้าง User พร้อมเก็บข้อมูลเรียบร้อย");
   } catch (error) {
     alert("สมัครไม่สำเร็จ")
