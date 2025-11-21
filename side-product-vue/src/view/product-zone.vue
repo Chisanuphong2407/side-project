@@ -1,26 +1,17 @@
 <template>
   <div class="product-list">
     <!-- แสดงรายการ product -->
-    <div v-for="p in product" :key="p._id" class="allProduct" @click="selectedItem(p._id)">
-      <p class="name">{{ p.productname }}</p>
-      <div v-if="selectItem == p._id" class="productDetails">
-        <p class="name">{{ p.description }}</p>
-        <p class="name">{{ p.quantity }}</p>
-        <p class="name">{{ p.unit }}</p>
-        <p class="name">{{ p.price }}</p>
-        <p class="name">{{ p.catalog }}</p>
-        <p class="name">{{ p.ownerID }}</p>
-        <img
-          :src="`${URL}` + p.image"
-          alt="Product Image"
-          style="max-width: auto; height: 300px; object-fit: contain"
-          class="product-image"
-        />
+    <div v-if="product.length > 0">
+      <div v-for="p in product" :key="p._id" class="allProduct">
+        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" />
         <div class="button-zone">
-          <button class="edit-button" @click="editProduct(p._id.toString())">แก้ไข</button>
-          <button class="delete-button" @click="deleteProduct(p._id.toString())" >ลบสินค้า</button>
+          <button class="edit-button" @click="editProduct(p._id)">แก้ไข</button>
+          <button class="delete-button" @click="deleteProduct(p._id)">ลบสินค้า</button>
         </div>
       </div>
+    </div>
+    <div v-else class="empty">
+      <p class="empty-text">ไม่มีรายการสินค้าในขณะนี้</p>
     </div>
   </div>
 </template>
@@ -30,6 +21,9 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useProductIDStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
+import productList from './product-list.vue'
+import { doc, deleteDoc } from 'firebase/firestore'
+import { db } from '@/firebase'
 // import { doc,getDoc } from 'firebase/firestore'
 // import { db } from '@/firebase'
 
@@ -37,13 +31,19 @@ defineOptions({
   name: 'productZone',
 })
 
-// interface Product {
-//   _id: string;
-
-// }
+interface Product {
+  _id: string;
+  productname: string;
+  description: string;
+  quantity: number;
+  unit: string;
+  price: string;
+  catalog: string;
+  ownerID: string;
+}
 
 const URL = import.meta.env.VITE_API_BASE_URL
-const product = ref<any[]>([])
+const product = ref<Product[]>([])
 const productStore = useProductIDStore()
 const router = useRouter()
 
@@ -65,11 +65,11 @@ const fetchProduct = async () => {
   }
 }
 
-const selectItem = ref(null)
+const selectItem = ref<string>()
 
-const selectedItem = (product: any) => {
+const selectedItem = (product: string) => {
   if (selectItem?.value && selectItem.value === product) {
-    selectItem.value = null // ปิดรายละเอียด
+    selectItem.value = '' // ปิดรายละเอียด
   } else {
     selectItem.value = product // เปิดรายละเอียด
   }
@@ -83,6 +83,8 @@ const editProduct = (product: string) => {
 const deleteProduct = async (product: string) => {
   try {
     await axios.delete(`${URL}/product/${product}`);
+
+    await deleteDoc(doc(db, "ProductPic", product))
     fetchProduct();
   } catch (error) {
     console.log(error);
@@ -95,13 +97,24 @@ const deleteProduct = async (product: string) => {
 .product-list {
   display: flex;
   flex-direction: column;
-  background-color: cornsilk;
+  background-color: rgb(211, 233, 220);
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  height: 85vh;
+}
+
+.empty-text {
+  font-size: 30px;
+  opacity: 0.5;
 }
 
 .allProduct {
   display: flex;
   flex-direction: column;
-  background-color: rgb(224, 172, 172);
+  background-color: rgb(166, 162, 162);
   border: 1px solid black;
 }
 
@@ -110,6 +123,7 @@ const deleteProduct = async (product: string) => {
   flex-direction: column;
   background-color: rgb(192, 148, 148);
 }
+
 .name {
   margin: 3px;
 }
