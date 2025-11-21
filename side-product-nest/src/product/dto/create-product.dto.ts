@@ -1,37 +1,39 @@
-import { IsDefined, IsNumber, IsString, ValidateIf } from 'class-validator';
+import { IsDefined, IsString, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Optional } from '@nestjs/common';
 
 export class CreateProductDto {
   @IsDefined()
   @IsString()
+  @IsNotEmpty()
   readonly productname: string;
 
   @IsDefined()
   @IsString()
+  @IsNotEmpty()
   readonly description: string;
 
   @IsDefined()
   @Type(() => Number)
+  @IsNotEmpty()
   readonly quantity: number;
 
   @IsDefined()
   @IsString()
+  @IsNotEmpty()
   readonly unit: string;
 
   @IsDefined()
   @Type(() => Number)
+  @IsNotEmpty()
   readonly price: number;
-
-  @Optional()
-  @IsString()
-  image: string;
 
   @IsDefined()
   @IsString()
+  @IsNotEmpty()
   readonly catalog: string;
 
   @IsDefined()
   @IsString()
+  @IsNotEmpty()
   readonly ownerID: string;
 }

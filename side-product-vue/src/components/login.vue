@@ -6,14 +6,14 @@
     </div>
     <div class="login-content">
       <form>
-        <label for="username">username: </label>
-        <input id="username" v-model="username" required />
+        <label for="email">email: </label>
+        <input id="email" v-model="email" required />
 
         <label for="password">password: </label>
         <input id="password" type="password" v-model="password" required />
       </form>
     </div>
-    <button type="submit" @click="onLogin(username || '', password || '')">เข้าสู่ระบบ</button>
+    <button type="submit" @click="onLogin(email || '', password || '')">เข้าสู่ระบบ</button>
     <p>หรือ</p>
     <a class="register" @click="register">สมัครสมาชิก</a>
   </div>
@@ -29,19 +29,20 @@ import { useUserNameStore } from '@/stores/counter';
 defineOptions({
   name: 'loginForm'
 })
-const username = ref<string>()
+const email = ref<string>()
 const password = ref<string>()
 const router = useRouter();
 
 const loginUser = useUserNameStore();
 
-const onLogin = async (username: string, password: string) => {
+const onLogin = async (email: string, password: string) => {
   try {
-    const LoginDredential = await signInWithEmailAndPassword(auth, username, password);
+    const LoginDredential = await signInWithEmailAndPassword(auth, email, password);
 
     const user = LoginDredential.user;
     loginUser.setUsername(<string>user.displayName)
-    console.log(loginUser)
+    console.log(user.displayName)
+    console.log(loginUser);
 
   } catch (error) {
     alert('เข้าสู่ระบบไม่สำเร็จ')

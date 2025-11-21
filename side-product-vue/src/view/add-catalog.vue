@@ -19,12 +19,13 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
 import axios from 'axios'
-export default {
+
+defineOptions({
   name: 'addCatalog',
-  setup: () => {
+})
     const catalog = ref<string>('')
     const unit = ref<string>('')
     const isLoading = ref(false)
@@ -63,15 +64,6 @@ export default {
         isLoading.value = false
       }
     }
-
-    return {
-      catalog,
-      unit,
-      submitCatalog,
-      isLoading,
-    }
-  },
-}
 </script>
 
 <style>

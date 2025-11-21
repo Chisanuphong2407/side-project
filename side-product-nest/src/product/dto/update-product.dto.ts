@@ -11,8 +11,6 @@ export class UpdateProductDto {
 
   readonly price?: number;
 
-  readonly image?: string;
-
   readonly catalog?: string;
 
   readonly ownerID?: string;

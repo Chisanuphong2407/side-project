@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { createUserWithEmailAndPassword ,updateProfile} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/index'
 import axios from 'axios';
@@ -84,12 +84,16 @@ const onSubmitRegister = async (email: string, password: string) => {
     //userCredential กลายเป็น OBJ
     //เก็บข้อมูลทั้งหมดของ account ที่พึ่งสร้าง
     const user = userCredential.user;
+
+    await updateProfile(user, { displayName: username.value })
+    console.log(user);
+    console.log(userCredential);
     //user เก็บ uid ไว้
     const uid = user.uid;
 
     //2. เก็บข้อมูล user เข้า db
     //doc(database,ชื่อ collection,ชื่อ doc)
-    //ไปที่ Database (db) -> คอลเลกชัน "users" -> สร้างเอกสารชื่อ "myUid"
+    //ไปที่ Database (db) -> คอลเลกชัน "User" -> สร้างเอกสารชื่อ "Uid"
     const userRef = doc(db, "User", uid);
 
     // คำสั่ง setDoc() คือการเขียนข้อมูลลงไปในตำแหน่งที่ระบุไว้
@@ -103,6 +107,8 @@ const onSubmitRegister = async (email: string, password: string) => {
       createdAt: new Date()    // เก็บเวลาที่สมัคร
     });
 
+
+
     await axios.post(`${URL}/user`, {
       uid: uid,
       username: username.value
@@ -112,8 +118,6 @@ const onSubmitRegister = async (email: string, password: string) => {
     alert("สมัครไม่สำเร็จ")
     console.log(error);
   }
-
-
 }
 </script>
 

@@ -3,60 +3,30 @@
     <div class="addproduct-header">เพิ่มสินค้าใหม่</div>
     <form @submit.prevent="submitProduct" class="add-product-form">
       <label for="product-name">ชื่อสินค้า</label>
-      <input
-        id="product-name"
-        type="text"
-        placeholder="ชื่อสินค้าของท่าน"
-        v-model="product.productname"
-        required
-      />
+      <input id="product-name" type="text" placeholder="ชื่อสินค้าของท่าน" v-model="product.productname" required />
 
       <label for="product-description">รายละเอียดสินค้า</label>
-      <input
-        id="product-description"
-        type="text"
-        placeholder="ข้อมูลเกี่ยวกับสินค้าของท่าน"
-        v-model="product.description"
-        required
-      />
+      <input id="product-description" type="text" placeholder="ข้อมูลเกี่ยวกับสินค้าของท่าน"
+        v-model="product.description" required />
 
       <label for="product-quantity">จำนวนสินค้า</label>
-      <input
-        id="product-quantity"
-        type="number"
-        placeholder="จำนวนสินค้า"
-        v-model="product.quantity"
-        min="1"
-        required
-      />
+      <input id="product-quantity" type="number" placeholder="จำนวนสินค้า" v-model="product.quantity" min="1"
+        required />
 
       <label for="product-unit">หน่วย</label>
-      <select id="product-unit" v-model="product.unit" required>
+      <select id="product-unit" v-model="product.unit" @change="Unitlog(product.unit)" required>
         <option disabled value="" selected>--หน่วย--</option>
         <option v-for="u in allUnit" :key="u._id">{{ u.unitname }}</option>
       </select>
 
       <label for="product-price">ราคา (บาท)</label>
-      <input
-        id="product-price"
-        type="number"
-        placeholder="ราคาสินค้า (บาท)"
-        v-model="product.price"
-        required
-      />
+      <input id="product-price" type="number" placeholder="ราคาสินค้า (บาท)" v-model="product.price" required />
 
       <div class="img">
         <label for="product-image">รูปภาพ</label>
         <img v-if="previewPath" :src="previewPath" alt="Image Preview" class="image-preview" />
 
-        <input
-          id="product-image"
-          type="file"
-          ref="fileInput"
-          @change="fileHandle"
-          accept="image/*"
-          required
-        />
+        <input id="product-image" type="file" ref="fileInput" @change="fileHandle" accept="image/*" required />
       </div>
 
       <label for="product-unit">หมวดหมู่</label>
@@ -71,132 +41,207 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
 import axios from 'axios'
 import { onMounted } from 'vue'
-export default {
-  name: 'addProduct',
-  setup: () => {
-    //เก็บ path ชั่วคราว ภาพตัวอย่าง
-    const previewPath = ref<string | null>(null)
-    const isloading = ref<boolean>(false)
-    const isSuccess = ref<boolean>(false)
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL
+import { db } from '@/firebase'
+import { doc, setDoc } from 'firebase/firestore'
 
-    const allUnit = ref()
-    const allCatalog = ref()
-    const product = ref({
+defineOptions({
+  name: 'addProduct',
+})
+//เก็บ path ชั่วคราว ภาพตัวอย่าง
+const previewPath = ref<string>('')
+const isloading = ref<boolean>(false)
+const isSuccess = ref<boolean>(false)
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+const allUnit = ref()
+const allCatalog = ref()
+const product = ref({
+  productname: '',
+  description: '',
+  quantity: 1,
+  unit: '',
+  price: 1,
+  image: '',
+  catalog: '',
+  ownerID: '123456789012348576849587',
+})
+
+onMounted(async () => {
+  try {
+    const unitData = await axios.get(`${BASE_URL}/unit`)
+    allUnit.value = unitData.data
+    console.log(allUnit.value);
+
+    const catalogData = await axios.get(`${BASE_URL}/catalog`)
+    allCatalog.value = catalogData.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+//เก็บ fileInput โดยตรง
+const fileInput = ref<HTMLInputElement | null>(null)
+
+//เก็บ OBJ file ที่เลือก
+const selectFile = ref<File | null>(null)
+
+
+//แปลงไฟล์เป็น base64
+const compressIMG = (file: File, quality = 0.7, maxWidth = 800): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader(); //สร้างตัวอ่านไฟล์
+    reader.readAsDataURL(file); // อ่านไฟล์
+    reader.onload = (event) => {
+      const img = new Image();
+      //สร้าง canvas เพื่อวาดรูปขึ้นใหม่
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = img.width;
+        let height = img.height;
+
+        //คำนวณขนาดใหม่
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth
+        }
+        canvas.width = width
+        canvas.height = height
+
+        //วาดรูปลง canvas
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        //แปลงเป็น blob พร้อมลดคุณภาพ
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("compression failed"));
+        }, 'image/jpeg', quality); // quality 0.7 คือชัด 70% (ขนาดลดลงเยอะมาก)
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err)
+  })
+}
+
+//convert IMG
+const convertIMGtobase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => resolve(reader.result as string);
+
+    reader.onerror = (err) => reject(err);
+  })
+}
+
+//@change activate
+const fileHandle = async (event: Event) => {
+  // ดึง Event.target มาเป็น HTMLInputElement เพื่อช่วย TypeScript
+  const target = event.target as HTMLInputElement
+  // ต้องแน่ใจว่าใช้ .files[0]
+  const file = target.files?.[0]; //ดึงไฟล์แรกที่ถูกเลือก
+
+  if (file) {
+    try {
+      // 1. สั่งย่อรูปก่อน (เหลือความกว้าง 800px, คุณภาพ 70%)
+      // ต่อให้รูปมา 10MB ก็จะเหลือแค่หลักร้อย KB
+      const compressBlob = await compressIMG(file, 0.7, 800);
+      console.log("ขนาดหลังย่อ:", compressBlob.size / 1024, "KB");
+
+      // 2. แปลง Blob กลับเป็น File (เพื่อให้โค้ดส่วนอื่นทำงานต่อได้เหมือนเดิม)
+      const compressFile = new File([compressBlob], file.name, {
+        type: 'image/jpeg',
+        lastModified: Date.now(),
+      });
+
+      // 3. ทำงานต่อตามปกติ แปลงไฟล์เป็น base64
+      selectFile.value = compressFile;
+      previewPath.value = await convertIMGtobase64(file);
+
+    } catch (error) {
+      alert("convert error")
+      console.log(error);
+    }
+  } else {
+    removeImage()
+  }
+}
+
+const removeImage = () => {
+  selectFile.value = null
+  previewPath.value = ''
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const Unitlog = (unit: string) => {
+  // const index = allUnit.value.indexOf(unit);
+  // console.log(index)
+  console.log(unit)
+  // console.log(allUnit.value[index]._id)
+}
+
+const submitProduct = async () => {
+  isloading.value = true
+
+  const photoOBJ = {
+    filename: selectFile.value?.name,
+    fileType: selectFile.value?.type,
+    fileSize: selectFile.value?.size,
+    base64: previewPath.value,
+  }
+
+  if (!selectFile.value) {
+    alert('กรุณาเลือกรูปภาพสินค้า!')
+    isloading.value = false
+    return
+  }
+  try {
+    // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
+    //    (Axios จะจัดการให้เองถ้าเป็น FormData)
+    const result = await axios.post(`${BASE_URL}/product`, {
+      productname: product.value.productname,
+      description: product.value.description,
+      quantity: product.value.quantity,
+      unit: product.value.unit,
+      price: product.value.price,
+      catalog: product.value.catalog,
+      ownerID: '12345678901234857684958',
+    })
+    alert('บันทึกสินค้าสำเร็จ!')
+
+    removeImage()
+    product.value = {
       productname: '',
       description: '',
-      quantity: 1,
+      quantity: 0,
       unit: '',
-      price: 1,
+      price: 0,
       image: '',
       catalog: '',
       ownerID: '123456789012348576849587',
+    }
+    const productID = result.data._id
+    const userRef = doc(db, 'ProductPic', productID);
+
+    await setDoc(userRef, {
+      productID: productID,
+      path: photoOBJ,
     })
-
-    onMounted(async () => {
-      try {
-        const unitData = await axios.get(`${BASE_URL}/unit`)
-        allUnit.value = unitData.data
-
-        const catalogData = await axios.get(`${BASE_URL}/catalog`)
-        allCatalog.value = catalogData.data
-      } catch (error) {
-        console.log(error)
-      }
-    })
-
-    //เก็บ fileInput โดยตรง
-    const fileInput = ref<HTMLInputElement | null>(null)
-
-    //เก็บ OBJ file ที่เลือก
-    const selectFile = ref<File | null>(null)
-
-    //@change activate
-    const fileHandle = (event: Event) => {
-      // ดึง Event.target มาเป็น HTMLInputElement เพื่อช่วย TypeScript
-      const input = event.target as HTMLInputElement
-      // ต้องแน่ใจว่าใช้ .files[0]
-      const file = input.files ? input.files[0] : null //ดึงไฟล์แรกที่ถูกเลือก
-
-      if (file) {
-        selectFile.value = file
-        previewPath.value = URL.createObjectURL(file)
-        console.log(selectFile)
-      } else {
-        removeImage()
-      }
-    }
-
-    const removeImage = () => {
-      selectFile.value = null
-      previewPath.value = null
-      if (fileInput.value) {
-        fileInput.value.value = ''
-      }
-    }
-
-    const submitProduct = async () => {
-      isloading.value = true
-
-      if (!selectFile.value) {
-        alert('กรุณาเลือกรูปภาพสินค้า!')
-        isloading.value = false
-        return
-      }
-      try {
-        // สร้าง FormData Object สำหรับส่งทั้งข้อมูลและไฟล์
-        const formData = new FormData()
-
-        formData.append('productname', product.value.productname)
-        formData.append('description', product.value.description)
-        formData.append('quantity', product.value.quantity.toString())
-        formData.append('unit', product.value.unit)
-        formData.append('price', product.value.price.toString())
-        formData.append('image', selectFile.value)
-
-        formData.append('catalog', product.value.catalog)
-        formData.append('ownerID', product.value.ownerID)
-
-        // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
-        //    (Axios จะจัดการให้เองถ้าเป็น FormData)
-        await axios.post(`${BASE_URL}/product`, formData)
-        alert('บันทึกสินค้าสำเร็จ!')
-
-        removeImage()
-        product.value = {
-          productname: '',
-          description: '',
-          quantity: 0,
-          unit: '',
-          price: 0,
-          image: '',
-          catalog: '',
-          ownerID: '123456789012348576849587',
-        }
-        isSuccess.value = true
-      } catch (error) {
-        console.log(error)
-        alert('เพิ่มข้อมูลไม่สำเร็จ');
-      } finally {
-        isloading.value = false
-      }
-    }
-
-    return {
-      product,
-      submitProduct,
-      isloading,
-      fileHandle,
-      fileInput,
-      previewPath,
-      allUnit,
-      allCatalog,
-    }
-  },
+    isSuccess.value = true
+  } catch (error) {
+    console.log(error)
+    alert('เพิ่มข้อมูลไม่สำเร็จ');
+  } finally {
+    isloading.value = false
+  }
 }
 </script>
 

@@ -1,36 +1,50 @@
   <template>
-  <div>
-    <div class="container" v-if="login">
-      <productHeader class="header" />
-      <navigator class="nav" />
-      <content class="content" />
+    <div>
+      <div class="container" v-if="isLogin">
+        <productHeader class="header" />
+        <navigator class="nav" />
+        <content class="content" />
+      </div>
+      <div v-else>
+        <content />
+      </div>
     </div>
-    <div v-else>
-      <content />
-    </div>
-  </div>
-</template>
+  </template>
 
-  <script lang="ts" setup>
+<script lang="ts" setup>
 import productHeader from './components/product-header.vue'
 import content from './components/content.vue'
 import navigator from './components/navigator.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserNameStore } from './stores/counter'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from './firebase'
 
 const router = useRouter()
-const login = ref<boolean>(false)
-const userName = useUserNameStore();
+// const login = ref<boolean>(true)
+const isLogin = ref<boolean>(false);
 
 onMounted(() => {
-  if (userName) {
-    router.replace('/loginForm');
-  }
+  onAuth();
 })
+
+
+const onAuth = () => {
+  onAuthStateChanged(auth, (user) => {
+    console.log('checking')
+    if (user) {
+      isLogin.value = true
+      router.replace('/product');
+    } else {
+      isLogin.value = false
+      router.replace('/loginForm');
+    }
+  })
+}
+
 </script>
 
-  <style scoped>
+<style scoped>
 .container {
   height: 100vh;
   max-width: 100vw;

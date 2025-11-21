@@ -30,10 +30,17 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useProductIDStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
+// import { doc,getDoc } from 'firebase/firestore'
+// import { db } from '@/firebase'
 
 defineOptions({
   name: 'productZone',
 })
+
+// interface Product {
+//   _id: string;
+
+// }
 
 const URL = import.meta.env.VITE_API_BASE_URL
 const product = ref<any[]>([])
@@ -52,6 +59,7 @@ const fetchProduct = async () => {
     // console.log(productfetch)
 
     product.value = productfetch.data
+
   } catch (error) {
     console.log(error)
   }
@@ -59,11 +67,11 @@ const fetchProduct = async () => {
 
 const selectItem = ref(null)
 
-const selectedItem = (p: any) => {
-  if (selectItem?.value && selectItem.value === p) {
+const selectedItem = (product: any) => {
+  if (selectItem?.value && selectItem.value === product) {
     selectItem.value = null // ปิดรายละเอียด
   } else {
-    selectItem.value = p // เปิดรายละเอียด
+    selectItem.value = product // เปิดรายละเอียด
   }
 }
 

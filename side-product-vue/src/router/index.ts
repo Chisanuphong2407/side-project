@@ -13,6 +13,7 @@ import register from '@/components/register.vue'
 
 const routes = [
   { path: '/', name: 'productZone', component: productZone },
+  { path: '/productZone', name: 'productZone', component: productZone },
   { path: '/addProduct', name: 'addProduct', component: addProduct },
   { path: '/addCatalog', name: 'addCatalog', component: addCatalog },
   { path: '/editProduct', name: 'editProduct', component: editProduct },

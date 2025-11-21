@@ -21,7 +21,8 @@ const firebaseConfig = {
 //initialize firebase
 const app = initializeApp(firebaseConfig)
 
-//export firebase auth app
+//export firebase auth app เกี่ยวกับ user
 export const auth = getAuth(app)
-//export firebase database app
+
+//export firebase database app เกี่ยวกับ ฐานข้อมูล
 export const db = getFirestore(app)

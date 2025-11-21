@@ -40,7 +40,7 @@ export const useUserUIDStore = defineStore('uid', () => {
 })
 
 export const useUserNameStore = defineStore('username', () => {
-  const currentUsername = ref<string>()
+  const currentUsername = ref<string>('')
 
   const setUsername = (username: string) => {
     currentUsername.value = username

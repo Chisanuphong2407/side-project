@@ -20,10 +20,7 @@ export class Product {
   @Prop()
   price: number;
 
-  @Prop({ type: String, required: true })
-  image: string;
-
-  @Prop({ type: String, required: true })
+  @Prop()
   catalog: string;
 
   @Prop()
