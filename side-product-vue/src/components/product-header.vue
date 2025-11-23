@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <button @click="logout">logout</button>
       <h1>ระบบจัดการสินค้า</h1>
+      <button @click="logout" class="logout-btn">logout</button>
     </div>
   </div>
 </template>
@@ -29,13 +29,30 @@ const logout = () => {
 <style>
 .container {
   display: flex;
-  flex-direction: column;
 }
 
 .header {
+  display: flex;
+  flex-direction: row;
   background-color: antiquewhite;
-  width: 100vw;
-  text-align: center;
+  width: 97vw;
   font-size: 3vh;
+  padding-inline: 1vw;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  height: fit-content;
+  width: fit-content;
+  padding: 1vw;
+  border-radius: 1vh;
+  font-size: 16px;
+  border-width: 0.5px;
+  font-family: monospace;
+}
+
+.logout-btn:active {
+  background-color: rgb(189, 189, 189);
 }
 </style>

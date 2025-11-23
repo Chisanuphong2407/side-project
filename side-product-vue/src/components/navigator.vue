@@ -16,25 +16,36 @@
 
 <style scoped>
 .allNavigator {
-    padding-inline: 1vw;
-    padding-block: 2vh;
-    background-color: darkgray;
+  display: flex;
+  padding-inline: 1vw;
+  /* padding-block: 2vh; */
+  justify-content: center;
+  background: linear-gradient(30deg,antiquewhite, #fefefe, antiquewhite);
 }
 
 .navigator {
-    display: flex;
-    flex-direction: column;
-    margin-top: 3vh;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3vh;
+  text-align: center;
 }
 
 .nav-item {
-    margin-block: 0.7vh;
-    text-decoration: none;
-    font-size: 2.5vh;
-}
-.sidebar-header  {
-    font-weight: bold;
-    font-size: large;
+  margin-block: 1vh;
+  text-decoration: none;
+  font-size: 2.5vh;
+  color: black;
+  transition: transform 0.3s ease;
 }
 
+.nav-item:hover {
+  /* font-size: 2.9vh; */
+  transform: scale(1.3);
+}
+
+.sidebar-header {
+  font-weight: bold;
+  font-size: larger;
+  text-align: center;
+}
 </style>
