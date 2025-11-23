@@ -18,9 +18,10 @@
 .allNavigator {
   display: flex;
   padding-inline: 1vw;
-  /* padding-block: 2vh; */
+  padding-block: 2vh;
   justify-content: center;
-  background: linear-gradient(30deg,antiquewhite, #fefefe, antiquewhite);
+  background-color: rgb(56, 56, 56);
+  color: white;
 }
 
 .navigator {
@@ -34,7 +35,7 @@
   margin-block: 1vh;
   text-decoration: none;
   font-size: 2.5vh;
-  color: black;
+  color: rgb(255, 255, 255);
   transition: transform 0.3s ease;
 }
 
@@ -45,7 +46,8 @@
 
 .sidebar-header {
   font-weight: bold;
-  font-size: larger;
+  font-size: 20px;
   text-align: center;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 </style>

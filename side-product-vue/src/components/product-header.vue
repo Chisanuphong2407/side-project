@@ -29,12 +29,13 @@ const logout = () => {
 <style>
 .container {
   display: flex;
+  width: auto;
+  background-color: antiquewhite;
 }
 
 .header {
   display: flex;
   flex-direction: row;
-  background-color: antiquewhite;
   width: 97vw;
   font-size: 3vh;
   padding-inline: 1vw;

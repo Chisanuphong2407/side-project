@@ -281,6 +281,7 @@ input {
 .addproduct-header {
   text-align: center;
   font-size: 5vh;
+  font-family:sans-serif;
   padding: 1vw;
 }
 

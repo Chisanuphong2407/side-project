@@ -1,8 +1,12 @@
 <template>
-  <router-view />
+  <router-view class="content"/>
 </template>
 
 <script lang="ts" setup>
 </script>
 
-<style></style>
+<style>
+.content {
+  background-color: rgb(255, 249, 241);
+}
+</style>

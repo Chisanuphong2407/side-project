@@ -50,7 +50,7 @@ const onAuth = () => {
   max-width: 100vw;
   display: grid;
   grid-template-columns: 10vw 1fr;
-  grid-template-rows: 15vh 1fr;
+  grid-template-rows: 10vh 1fr;
   grid-template-areas:
     'header header'
     'nav main';

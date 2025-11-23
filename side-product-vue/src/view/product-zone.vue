@@ -1,13 +1,9 @@
 <template>
   <div class="product-list">
     <!-- แสดงรายการ product -->
-    <div v-if="product.length > 0">
+    <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
-        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" />
-        <div class="button-zone">
-          <button class="edit-button" @click="editProduct(p._id)">แก้ไข</button>
-          <button class="delete-button" @click="deleteProduct(p._id)">ลบสินค้า</button>
-        </div>
+        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" @edit="editProduct" @delete="deleteProduct" />
       </div>
     </div>
     <div v-else class="empty">
@@ -97,7 +93,19 @@ const deleteProduct = async (product: string) => {
 .product-list {
   display: flex;
   flex-direction: column;
-  background-color: rgb(211, 233, 220);
+  /* background-color: rgb(211, 230, 233); */
+}
+
+.product-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  grid-auto-flow: dense;
+  overflow-x: auto;
+  overflow-y: auto;
+  gap: 10px;
+  margin: 1vw;
+  /* width: fit-content; */
 }
 
 .empty {
@@ -114,40 +122,11 @@ const deleteProduct = async (product: string) => {
 .allProduct {
   display: flex;
   flex-direction: column;
-  background-color: rgb(166, 162, 162);
-  border: 1px solid black;
-}
-
-.productDetails {
-  display: flex;
-  flex-direction: column;
-  background-color: rgb(192, 148, 148);
+  /* background-color: rgb(166, 162, 162); */
+  /* border: 1px solid black; */
 }
 
 .name {
   margin: 3px;
-}
-
-.edit-button {
-  margin: 5px;
-  width: fit-content;
-  padding-block: 3px;
-}
-
-.delete-button {
-  margin: 5px;
-  width: fit-content;
-  padding-block: 3px;
-}
-
-.delete-button:hover {
-  background-color: rgb(197, 35, 35);
-  color: aliceblue;
-}
-
-.button-zone {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
 }
 </style>
