@@ -3,7 +3,7 @@
     <div class="header">
       <h1 class="web-header" @click="resetPath">ระบบจัดการสินค้า</h1>
       <div class="right-element">
-        <h3>{{ userStore.currentUsername }}</h3>
+        <h3 class="username">{{ userStore.currentUsername }}</h3>
         <Icon icon="material-symbols:logout-rounded" width="4vh" height="4vh" @click="logout" class="logout-btn" />
       </div>
     </div>
@@ -20,9 +20,9 @@ import { useRouter } from 'vue-router'
 const userStore = useUserNameStore();
 const router = useRouter();
 
-const logout = () => {
+const logout = async() => {
   try {
-    signOut(auth).then(() => {
+    await signOut(auth).then(() => {
       console.log("logout!!!")
     })
     userStore.setUsername('')
@@ -56,7 +56,7 @@ const resetPath = () => {
 
 .logout-btn {
   height: fit-content;
-  width: fit-content;
+  width: 4vh;
   padding: 1vw;
   border-radius: 1vh;
   font-size: 16px;
@@ -74,11 +74,16 @@ const resetPath = () => {
   cursor: pointer;
   user-select: none;
   margin-left: 1vw;
+  font-size: 5vh;
 }
 
 .right-element {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.username {
+  font-size: 4vh;
 }
 </style>

@@ -47,7 +47,7 @@ const onLogin = async (email: string, password: string) => {
     const user = LoginDredential.user;
     loginUser.setUsername(<string>user.displayName)
     loginUID.setUid(<string>user.uid);
-    console.log(user.displayName)
+    console.log(user)
     console.log(loginUID.currentUid);
     console.log(loginUser);
 
@@ -64,7 +64,7 @@ const register = () => {
 }
 </script>
 
-<style>
+<style scoped>
 .login-container {
   background-color: aliceblue;
   display: flex;
@@ -85,7 +85,7 @@ const register = () => {
   border: 1px solid;
   padding: 2%;
   margin: 3%;
-  border-radius: 3vh;
+  border-radius: 1vh;
 }
 
 .login-btn {
@@ -103,5 +103,9 @@ const register = () => {
 .register {
   text-decoration-line: underline;
   cursor: pointer;
+}
+
+input {
+  margin-bottom: 2vh;
 }
 </style>

@@ -300,6 +300,9 @@ input {
   border-radius: 1vw;
 }
 
+.submit-button:active {
+  transform: translateY(4px);
+}
 
 .reset-button {
   margin-block: 15px;
@@ -311,6 +314,7 @@ input {
   cursor: pointer;
   border-width: 0px;
   border-radius: 1vw;
+  transition: all 0.3s ;
 }
 
 .reset-button:hover {

@@ -113,6 +113,8 @@ const onSubmitRegister = async (email: string, password: string) => {
       uid: uid,
       username: username.value
     })
+
+    user.delete();
     console.log("สำเร็จ! สร้าง User พร้อมเก็บข้อมูลเรียบร้อย");
   } catch (error) {
     alert("สมัครไม่สำเร็จ")
@@ -142,7 +144,7 @@ const onSubmitRegister = async (email: string, password: string) => {
   border: 1px solid;
   padding: 2%;
   margin: 3%;
-  border-radius: 3vh;
+  border-radius: 1vh;
 }
 
 .register-btn {
@@ -153,5 +155,9 @@ const onSubmitRegister = async (email: string, password: string) => {
   padding-inline: 1vw;
   border-radius: 15px;
   border-width: 1px;
+}
+
+.register-btn:active {
+  background-color: rgb(204, 204, 204);
 }
 </style>

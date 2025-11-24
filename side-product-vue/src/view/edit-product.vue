@@ -34,9 +34,12 @@
           <option disabled value="" selected>--หมวดหมู่--</option>
           <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
-        <button type="submit" class="submit-button" :disabled="isloading">
-          {{ isloading ? 'กำลังบันทึก' : 'บันทึก' }}
-        </button>
+        <div class="button-zone">
+          <button type="submit" class="submit-button" :disabled="isloading">
+            {{ isloading ? 'กำลังบันทึก' : 'บันทึก' }}
+          </button>
+          <button type="reset" class="reset-button">รีเซ็ตข้อมูล</button>
+        </div>
       </form>
     </div>
   </div>
@@ -70,6 +73,7 @@ const previewPath = ref<string | null>(null)
 // File Refs
 const fileInput = ref<HTMLInputElement | null>(null)
 const selectFile = ref<File | null>(null)
+const photoOBJ = ref()
 
 onMounted(async () => {
   console.log(productID)
@@ -93,6 +97,12 @@ onMounted(async () => {
     if (docSnap.exists()) {
       // console.log("ข้อมูลที่ได้:", docSnap.data().path.base64);
       previewPath.value = docSnap.data().path.base64
+      photoOBJ.value = {
+        base64: previewPath.value,
+        filename: docSnap.data().path.filename,
+        fileType: docSnap.data().path.fileType,
+        fileSize: docSnap.data().path.fileSize,
+      }
     }
   } catch (error) {
     alert('error')
@@ -181,6 +191,14 @@ const fileHandle = async (event: Event) => {
       // 3. ทำงานต่อตามปกติ แปลงไฟล์เป็น base64
       selectFile.value = compressFile;
       previewPath.value = await convertIMGtobase64(compressFile);
+
+      photoOBJ.value = {
+        base64: previewPath.value,
+        fileSize: selectFile.value?.size,
+        fileType: selectFile.value?.type,
+        filename: selectFile.value?.name,
+      }
+      console.log('photo', photoOBJ)
     } catch (error) {
       console.log(error);
     }
@@ -204,28 +222,19 @@ const submitProduct = async () => {
     await axios.patch(`${URL}/product/${productID}`, sendData)
     const imageRef = doc(db, "ProductPic", productID || '');
 
-    const photoOBJ = {
-      filename: selectFile.value?.name,
-      fileType: selectFile.value?.type,
-      fileSize: selectFile.value?.size,
-      base64: previewPath.value,
-    }
-
+    console.log('photo', photoOBJ.value)
     await setDoc(imageRef, {
       productID: productID,
-      path: photoOBJ,
+      path: photoOBJ.value,
     })
     isloading.value = false
     router.push('/');
     alert('อัพเดตสำเร็จ')
   } catch (error) {
     alert(error)
-    isloading.value = false // ควรปิด loading กรณี error ด้วย
+    isloading.value = false
   }
 }
 </script>
 
-<style>
-/* .image-preview {
-} */
-</style>
+<style></style>

@@ -117,6 +117,11 @@ const deleteProduct = async (product: string) => {
   max-height: 100%;
 }
 
+@media (max-width: 1200px) {
+  .product-container {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
 .empty {
   display: grid;
   place-items: center;

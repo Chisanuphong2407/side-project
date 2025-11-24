@@ -33,7 +33,7 @@ onMounted(() => {
 const onAuth = () => {
   onAuthStateChanged(auth, (user) => {
     console.log('checking')
-    if (user) {
+    if (user != undefined) {
       isLogin.value = true
       userStore.setUsername(<string>user.displayName)
       userUidStore.setUid(user.uid)
@@ -52,8 +52,8 @@ const onAuth = () => {
   height: 100vh;
   max-width: 100vw;
   display: grid;
-  grid-template-columns: 10vw 1fr;
-  grid-template-rows: 10vh 1fr;
+  grid-template-columns: 12vw 1fr;
+  grid-template-rows: 15vh 1fr;
   grid-template-areas:
     'header header'
     'nav main';

@@ -20,7 +20,7 @@
       <p class="name">{{ info.ownerID }}</p> -->
       <div class="button-zone">
         <button class="edit-button" @click="editProduct(info._id)">แก้ไข</button>
-        <Icon icon="material-symbols:delete-outline-rounded" width="30" height="30" color="#C20506"
+        <Icon icon="material-symbols:delete-outline-rounded" width="30px" height="30px" color="#C20506"
           @click="deleteProduct(info._id)" class="delete-button" />
       </div>
     </div>
@@ -81,7 +81,6 @@ const deleteProduct = (productID: string) => {
 
 <style scoped>
 .product-list {
-  cursor: pointer;
   user-select: none;
   display: flex;
   flex-direction: column;
@@ -104,29 +103,40 @@ const deleteProduct = (productID: string) => {
   height: 20vh;
   width: 15vw;
   object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.product-image:hover {
+  height: 30vh;
+  width: 20vw;
 }
 
 .product-name {
   font-weight: bold;
-  font-size: 5vh;
+  font-size: 30px;
   margin-bottom: 2vh;
 }
 
 .edit-button {
   margin: 5px;
   width: fit-content;
+  font-size: 15;
   padding: 9px;
   padding-inline: 1.5vw;
   border-radius: 1vh;
   border-width: 0px;
+  transition: all;
   cursor: pointer;
-  transition: all ;
 }
 
 .edit-button:active {
   background-color: #b1b0b0;
   color: #ebe8e8;
   transform: translateY(4px);
+}
+
+.delete-button {
+    cursor: pointer;
 }
 
 .button-zone {
@@ -142,6 +152,7 @@ const deleteProduct = (productID: string) => {
   padding: 2vh;
   text-align: left;
   justify-content: center;
+  cursor: pointer;
 }
 
 .productDetails {
@@ -149,15 +160,19 @@ const deleteProduct = (productID: string) => {
   padding: 2vh;
   /* max-width: 80vw; */
   max-height: 80vh;
-  border-bottom-right-radius:1vh ;
+  border-bottom-right-radius: 1vh;
   border-bottom-left-radius: 1vh;
 }
 
 h3 {
   font-weight: bolder;
-  margin-block: 1px;
+  margin-block: 1vw;
+  font-size: 22px;
 }
 
+.name {
+  font-size: 18px;
+}
 p {
   margin-block: 3px;
   margin-bottom: 15px;
