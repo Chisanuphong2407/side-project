@@ -32,6 +32,11 @@ export class ProductService {
     return data;
   }
 
+  async search(text: string): Promise<Product[] | null> {
+    console.log('search');
+    return this.productModel.find({ productname: { $regex: text } }).exec();
+  }
+
   async update(
     id: string,
     updateProductDto: UpdateProductDto,

@@ -1,9 +1,28 @@
 <template>
   <div class="product-list">
     <!-- แสดงรายการ product -->
+    <div class="search">
+      <div class="search-block">
+        <input v-model="search" placeholder="ค้นหาสินค้า" @change="onSearch(search || '')" />
+        <Icon icon="material-symbols:search" width="24" height="24" @click="onSearch(search || '')" />
+      </div>
+      <div class="catalog-block" v-if="allCatalog">
+        <select v-model="selectCatalog" >
+          <option disabled value="" selected>--หมวดหมู่--</option>
+          <option v-for="c in allCatalog" :key="c._id" value="c._id">{{ c.catalogName }}</option>
+        </select>
+      </div>
+      <div class="unit-block" v-if="allUnit">
+        <select v-model="selectUnit" >
+          <option disabled value="" selected>--หน่วย--</option>
+          <option v-for="c in allUnit" :key="c._id" value="c._id">{{ c.unitname }}</option>
+        </select>
+      </div>
+    </div>
     <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
-        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" @edit="editProduct" @delete="deleteProduct"  class="product-list"/>
+        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)"
+          @edit="editProduct" @delete="deleteProduct" class="product-list" />
       </div>
     </div>
     <div v-else class="empty">
@@ -20,6 +39,7 @@ import { useRouter } from 'vue-router'
 import productList from './product-list.vue'
 import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
+import { Icon } from '@iconify/vue'
 // import { doc,getDoc } from 'firebase/firestore'
 // import { db } from '@/firebase'
 
@@ -38,12 +58,28 @@ interface Product {
   ownerID: string;
 }
 
+interface Catalog {
+  _id: string;
+  catalogName:string;
+}
+
+interface Unit {
+  _id: string;
+  unitname:string;
+}
+
 const URL = import.meta.env.VITE_API_BASE_URL
 const product = ref<Product[]>([])
 const productStore = useProductIDStore()
 const userStore = useUserUIDStore();
 const uid = userStore.currentUid
 const router = useRouter()
+const search = ref<string>()
+
+const allCatalog = ref<Catalog[]>()
+const selectCatalog = ref<string>('')
+const allUnit = ref<Unit[]>()
+const selectUnit = ref<string>('')
 
 onMounted(() => {
   fetchProduct()
@@ -59,16 +95,28 @@ const fetchProduct = async () => {
 
     product.value = productfetch.data
 
+    const catalogData = await axios.get(`${URL}/catalog/`)
+    allCatalog.value = catalogData.data;
+
+    const unitData = await axios.get(`${URL}/unit/`)
+    allUnit.value = unitData.data;
   } catch (error) {
     console.log(error)
   }
 }
 
-// const fetchUser = async() => {
-//   const userData = await axios.get(`${URL}/user/${uid}`)
-//   const userResult = userData.data.username
-//   console.log('user',userResult);
-// }
+const onSearch = async (search: string) => {
+  try {
+    const result = await axios.get(`${URL}/product/search/${search}`);
+
+    product.value = result.data;
+    if (product.value.length > 0) {
+    }
+  } catch (error) {
+    console.log('searchError', error);
+  }
+}
+
 const selectItem = ref<string>()
 
 const selectedItem = (product: string) => {
@@ -119,9 +167,10 @@ const deleteProduct = async (product: string) => {
 
 @media (max-width: 1200px) {
   .product-container {
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
+
 .empty {
   display: grid;
   place-items: center;
@@ -144,4 +193,8 @@ const deleteProduct = async (product: string) => {
   margin: 3px;
 }
 
+.search {
+  display: flex;
+  flex-direction: row;
+}
 </style>

@@ -33,12 +33,15 @@ onMounted(() => {
 const onAuth = () => {
   onAuthStateChanged(auth, (user) => {
     console.log('checking')
+    console.log(user)
     if (user != undefined) {
+      console.log('auth------------------')
       isLogin.value = true
       userStore.setUsername(<string>user.displayName)
       userUidStore.setUid(user.uid)
       router.replace('/product');
     } else {
+      console.log("else+++++++++++++++++++++")
       isLogin.value = false
       router.replace('/loginForm');
     }
