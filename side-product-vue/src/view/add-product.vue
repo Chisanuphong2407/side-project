@@ -232,12 +232,12 @@ const submitProduct = async () => {
     product.value = {
       productname: '',
       description: '',
-      quantity: 0,
+      quantity: 1,
       unit: '',
-      price: 0,
+      price: 1,
       image: '',
       catalog: '',
-      ownerID: '123456789012348576849587',
+      ownerID: uid,
     }
     const productID = result.data._id
     const userRef = doc(db, 'ProductPic', productID);

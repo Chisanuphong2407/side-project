@@ -108,7 +108,7 @@ const deleteProduct = (productID: string) => {
 
 .product-name {
   font-weight: bold;
-  font-size: 25px;
+  font-size: 5vh;
   margin-bottom: 2vh;
 }
 
@@ -149,6 +149,8 @@ const deleteProduct = (productID: string) => {
   padding: 2vh;
   /* max-width: 80vw; */
   max-height: 80vh;
+  border-bottom-right-radius:1vh ;
+  border-bottom-left-radius: 1vh;
 }
 
 h3 {
