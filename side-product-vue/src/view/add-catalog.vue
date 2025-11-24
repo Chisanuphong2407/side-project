@@ -2,19 +2,21 @@
   <div class="add-product">
     <div class="addproduct-header">เพิ่มหมวดหมู่และหน่วยสินค้า</div>
     <form @submit.prevent="submitCatalog" class="catalog-form">
-      <div class="form-unit">
-        <label for="catalog-name" class="catalog-label">ชื่อหมวดหมู่</label>
-        <input id="catalog-name" type="text" placeholder="เพิ่มหมวดหมู่ของท่าน" v-model="catalog" />
-      </div>
+      <div class="catalog-card">
+        <div class="form-unit">
+          <label for="catalog-name" class="catalog-label">ชื่อหมวดหมู่</label>
+          <input id="catalog-name" type="text" placeholder="เพิ่มหมวดหมู่ของท่าน" v-model="catalog" />
+        </div>
 
-      <div class="form-unit">
-        <label for="unit-name" class="catalog-label">หน่วยสินค้า</label>
-        <input id="unit-name" type="text" placeholder="เพิ่มหน่วยสินค้าของท่าน" v-model="unit" />
-      </div>
+        <div class="form-unit">
+          <label for="unit-name" class="catalog-label">หน่วยสินค้า</label>
+          <input id="unit-name" type="text" placeholder="เพิ่มหน่วยสินค้าของท่าน" v-model="unit" />
+        </div>
 
-      <button type="submit" :disabled="isLoading" class="add-catalog">
-        {{ isLoading ? 'กำลังบันทึก' : 'บันทึก' }}
-      </button>
+        <button type="submit" :disabled="isLoading" class="add-catalog">
+          {{ isLoading ? 'กำลังบันทึก' : 'บันทึก' }}
+        </button>
+      </div>
     </form>
   </div>
 </template>
@@ -69,16 +71,22 @@ const submitCatalog = async () => {
 <style>
 .catalog-form {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   height: 70vh;
-  align-self: center
-};
+  align-self: center;
+}
+
+.catalog-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .form-unit {
   display: flex;
   flex-direction: row;
   margin-block: 80px;
-  border: 3px solid black;
+  margin-block: 3vh;
 }
 
 .add-catalog {
@@ -95,7 +103,7 @@ const submitCatalog = async () => {
 }
 
 .add-catalog:active {
-  background-color:rgb(179, 181, 181) ;
+  background-color: rgb(179, 181, 181);
   color: aliceblue;
 }
 </style>
