@@ -20,7 +20,7 @@
   padding-inline: 1vw;
   padding-block: 2vh;
   justify-content: center;
-  background-color: rgb(56, 56, 56);
+  background-color: rgb(80, 75, 69);
   color: white;
 }
 
@@ -46,7 +46,7 @@
 
 .sidebar-header {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 2vw;
   text-align: center;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }

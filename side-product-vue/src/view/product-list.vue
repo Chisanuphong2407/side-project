@@ -11,16 +11,17 @@
       <h3>จำนวนสินค้า:</h3>
       <p class="name">{{ info.quantity }}</p>
       <h3>หน่วย:</h3>
-      <p class="name">{{ info.unit }}</p>
+      <p class="name">{{ info.unit.unitname }}</p>
       <h3>ราคาสินค้า:</h3>
       <p class="name">{{ info.price }}</p>
       <h3>หมวดหมู่:</h3>
-      <p class="name">{{ info.catalog }}</p>
-      <h3>เจ้าของสินค้า:</h3>
-      <p class="name">{{ info.ownerID }}</p>
+      <p class="name">{{ info.catalog.catalogName }}</p>
+      <!-- <h3>เจ้าของสินค้า:</h3>
+      <p class="name">{{ info.ownerID }}</p> -->
       <div class="button-zone">
         <button class="edit-button" @click="editProduct(info._id)">แก้ไข</button>
-        <button class="delete-button" @click="deleteProduct(info._id)">ลบสินค้า</button>
+        <Icon icon="material-symbols:delete-outline-rounded" width="30" height="30" color="#C20506"
+          @click="deleteProduct(info._id)" class="delete-button" />
       </div>
     </div>
   </div>
@@ -30,6 +31,7 @@
 import { db } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { onMounted, ref } from 'vue';
+import { Icon } from '@iconify/vue';
 
 defineOptions({
   name: "productList",
@@ -55,10 +57,12 @@ onMounted(async () => {
 
   if (picSnap.exists()) {
     picURL.value = picSnap.data().path.base64;
-    console.log(picURL)
+    // console.log(picURL)
   } else {
     console.log('no img')
   }
+
+  console.log(props)
 })
 
 const onClick = (_id: string) => {
@@ -82,13 +86,23 @@ const deleteProduct = (productID: string) => {
   display: flex;
   flex-direction: column;
   border-radius: 1vh;
+  margin: 0.5vw;
   background-color: #ffebcd;
-  border: 0.5px solid black;
-  /* width: fit-content; */
+  transition: all 0.3s ease-in-out;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.product-list:hover {
+  box-shadow: 5px 5px 5px gray;
+  transform: scale(1);
 }
 
 .product-image {
-  height: 30vh;
+  display: flex;
+  flex-direction: column;
+  height: 20vh;
+  width: 15vw;
   object-fit: contain;
 }
 
@@ -101,36 +115,49 @@ const deleteProduct = (productID: string) => {
 .edit-button {
   margin: 5px;
   width: fit-content;
-  padding-block: 3px;
+  padding: 9px;
+  padding-inline: 1.5vw;
+  border-radius: 1vh;
+  border-width: 0px;
+  cursor: pointer;
+  transition: all ;
 }
 
-.delete-button {
-  margin: 5px;
-  width: fit-content;
-  padding-block: 3px;
-}
-
-.delete-button:hover {
-  background-color: rgb(197, 35, 35);
-  color: aliceblue;
+.edit-button:active {
+  background-color: #b1b0b0;
+  color: #ebe8e8;
+  transform: translateY(4px);
 }
 
 .button-zone {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .product-title {
+  display: flex;
+  flex-direction: column;
   padding: 2vh;
+  text-align: left;
+  justify-content: center;
 }
 
 .productDetails {
   background-color: #f0ddbf;
   padding: 2vh;
+  /* max-width: 80vw; */
+  max-height: 80vh;
 }
 
 h3 {
   font-weight: bolder;
+  margin-block: 1px;
+}
+
+p {
+  margin-block: 3px;
+  margin-bottom: 15px;
 }
 </style>

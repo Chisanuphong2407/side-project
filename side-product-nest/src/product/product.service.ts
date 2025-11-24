@@ -19,8 +19,12 @@ export class ProductService {
     return data.save();
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productModel.find().exec();
+  async findAll(uid: string): Promise<Product[]> {
+    return this.productModel
+      .find({ ownerID: uid })
+      .populate('catalog')
+      .populate('unit')
+      .exec();
   }
 
   async findOne(id: string): Promise<Product | null> {

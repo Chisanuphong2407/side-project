@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type CatalogDocument = Catalog & Document;
 
 @Schema()
 export class Catalog {
-  @Prop()
+  @Prop({ type: Types.ObjectId, ref: 'Catalog', required: true })
   catalogName: string;
 }
 

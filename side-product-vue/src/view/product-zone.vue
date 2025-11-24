@@ -3,7 +3,7 @@
     <!-- แสดงรายการ product -->
     <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
-        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" @edit="editProduct" @delete="deleteProduct" />
+        <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)" @edit="editProduct" @delete="deleteProduct"  class="product-list"/>
       </div>
     </div>
     <div v-else class="empty">
@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useProductIDStore } from '../stores/counter'
+import { useProductIDStore, useUserUIDStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
 import productList from './product-list.vue'
 import { doc, deleteDoc } from 'firebase/firestore'
@@ -41,18 +41,21 @@ interface Product {
 const URL = import.meta.env.VITE_API_BASE_URL
 const product = ref<Product[]>([])
 const productStore = useProductIDStore()
+const userStore = useUserUIDStore();
+const uid = userStore.currentUid
 const router = useRouter()
 
 onMounted(() => {
   fetchProduct()
+  // fetchUser()
 })
 
 const fetchProduct = async () => {
   try {
     //fetch product ทั้งหมดออกมา
     console.log('url', URL)
-    const productfetch = await axios.get(`${URL}/product`)
-    // console.log(productfetch)
+    const productfetch = await axios.get(`${URL}/product/all/${uid}`)
+    console.log(productfetch)
 
     product.value = productfetch.data
 
@@ -61,6 +64,11 @@ const fetchProduct = async () => {
   }
 }
 
+// const fetchUser = async() => {
+//   const userData = await axios.get(`${URL}/user/${uid}`)
+//   const userResult = userData.data.username
+//   console.log('user',userResult);
+// }
 const selectItem = ref<string>()
 
 const selectedItem = (product: string) => {
@@ -106,6 +114,7 @@ const deleteProduct = async (product: string) => {
   gap: 10px;
   margin: 1vw;
   /* width: fit-content; */
+  max-height: 100%;
 }
 
 .empty {
@@ -129,4 +138,5 @@ const deleteProduct = async (product: string) => {
 .name {
   margin: 3px;
 }
+
 </style>

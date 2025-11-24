@@ -17,7 +17,7 @@ export class UnitService {
   }
 
   async findAll(): Promise<Unit[]> {
-    const units = this.unitModel.find().exec();
+    const units = this.unitModel.find().populate('_id').exec();
     return units;
   }
 

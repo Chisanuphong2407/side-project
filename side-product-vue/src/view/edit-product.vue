@@ -16,7 +16,7 @@
         <label for="product-unit">หน่วย</label>
         <select id="product-unit" v-model="product.unit">
           <option disabled value="" selected>--หน่วย--</option>
-          <option v-for="u in allUnit" :key="u._id">{{ u.unitname }}</option>
+          <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
         </select>
 
         <label for="product-price">ราคา (บาท)</label>
@@ -32,7 +32,7 @@
         <label for="product-unit">หมวดหมู่</label>
         <select id="product-unit" v-model="product.catalog">
           <option disabled value="" selected>--หมวดหมู่--</option>
-          <option v-for="c in allCatalog" :key="c._id">{{ c.catalogName }}</option>
+          <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
         <button type="submit" class="submit-button" :disabled="isloading">
           {{ isloading ? 'กำลังบันทึก' : 'บันทึก' }}
@@ -47,7 +47,7 @@ import { onMounted, ref, toRaw, unref } from 'vue'
 import { useProductIDStore } from '@/stores/counter'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 
 // กำหนดชื่อ Component (Optional: จำเป็นถ้าใช้ KeepAlive หรืออยากเห็นชื่อใน DevTools)
@@ -74,7 +74,7 @@ const selectFile = ref<File | null>(null)
 onMounted(async () => {
   console.log(productID)
   try {
-    const productData = await axios.get(`${URL}/product/${productID}`)
+    const productData = await axios.get(`${URL}/product/get/${productID}`)
     product.value = productData.data;
     console.log(product.value)
 
@@ -180,7 +180,7 @@ const fileHandle = async (event: Event) => {
 
       // 3. ทำงานต่อตามปกติ แปลงไฟล์เป็น base64
       selectFile.value = compressFile;
-      previewPath.value = await convertIMGtobase64(file);
+      previewPath.value = await convertIMGtobase64(compressFile);
     } catch (error) {
       console.log(error);
     }
@@ -202,6 +202,19 @@ const submitProduct = async () => {
 
   try {
     await axios.patch(`${URL}/product/${productID}`, sendData)
+    const imageRef = doc(db, "ProductPic", productID || '');
+
+    const photoOBJ = {
+      filename: selectFile.value?.name,
+      fileType: selectFile.value?.type,
+      fileSize: selectFile.value?.size,
+      base64: previewPath.value,
+    }
+
+    await setDoc(imageRef, {
+      productID: productID,
+      path: photoOBJ,
+    })
     isloading.value = false
     router.push('/');
     alert('อัพเดตสำเร็จ')
@@ -212,4 +225,7 @@ const submitProduct = async () => {
 }
 </script>
 
-<style></style>
+<style>
+/* .image-preview {
+} */
+</style>

@@ -90,6 +90,8 @@ const submitCatalog = async () => {
   font-size: large;
   border-width: 0px;
   background-color: rgb(215, 216, 216);
+  box-shadow: 2px 2px 3px gray;
+  cursor: pointer;
 }
 
 .add-catalog:active {

@@ -18,7 +18,7 @@ export class CatalogService {
   }
 
   async findAll(): Promise<Catalog[]> {
-    const catalogs = this.catalogModel.find().exec();
+    const catalogs = this.catalogModel.find().populate('_id').exec();
     return catalogs;
   }
 

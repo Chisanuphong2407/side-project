@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UnitDocument = Unit & Document;
 
 @Schema()
 export class Unit {
-  @Prop()
+  @Prop({ type: Types.ObjectId, ref: 'Unit', required: true })
   unitname: string;
 }
 

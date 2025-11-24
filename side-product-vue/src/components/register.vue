@@ -6,26 +6,26 @@
     <div class="register-content">
       <form @submit.prevent="onSubmitRegister(email ?? '', password ?? '')">
         <label for="firstname">ชื่อ: </label>
-        <input id="firstname" v-model="firstname" required />
+        <input id="firstname" v-model="firstname" placeholder="ชื่อจริง" required />
 
         <label for="lastname">นามสกุล: </label>
-        <input id="lastname" v-model="lastname" required />
+        <input id="lastname" v-model="lastname" placeholder="นามสกุล" required />
 
         <label for="email">email: </label>
-        <input id="email" v-model="email" required />
+        <input id="email" v-model="email" placeholder="อีเมล์" required />
 
         <label for="phone">โทรศัพท์: </label>
-        <input id="phone" v-model="phone" required />
+        <input id="phone" v-model="phone" placeholder="โทรศัพท์" required />
 
         <label for="username">username: </label>
-        <input id="username" v-model="username" required />
+        <input id="username" v-model="username" placeholder="username" required />
 
         <label for="password">รหัสผ่าน: </label>
-        <input id="password" type="password" v-model="password" required />
+        <input id="password" type="password" v-model="password" placeholder="รหัสผ่าน" required />
 
         <label for="confirmPassword">ยืนยันรหัสผ่าน: </label>
-        <input id="confirmPassword" type="password" v-model="confirmPassword" required />
-        <button type="submit">สมัครสมาชิก</button>
+        <input id="confirmPassword" type="password" v-model="confirmPassword" placeholder="ยืนยันรหัสผ่าน" required />
+        <button type="submit" class="register-btn">สมัครสมาชิก</button>
       </form>
     </div>
   </div>
@@ -128,7 +128,7 @@ const onSubmitRegister = async (email: string, password: string) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  /* height: 100vh; */
   width: 100vw;
 }
 
@@ -142,5 +142,16 @@ const onSubmitRegister = async (email: string, password: string) => {
   border: 1px solid;
   padding: 2%;
   margin: 3%;
+  border-radius: 3vh;
+}
+
+.register-btn {
+  margin-top: 3vh;
+  width: fit-content;
+  align-self: center;
+  padding-block: 1vh;
+  padding-inline: 1vw;
+  border-radius: 15px;
+  border-width: 1px;
 }
 </style>

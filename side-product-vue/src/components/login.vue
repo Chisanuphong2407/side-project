@@ -7,13 +7,14 @@
     <div class="login-content">
       <form>
         <label for="email">email: </label>
-        <input id="email" v-model="email" required />
+        <input id="email" v-model="email" placeholder="email" required />
 
         <label for="password">password: </label>
-        <input id="password" type="password" v-model="password" required />
+        <input id="password" type="password" v-model="password" placeholder="password" required />
       </form>
     </div>
-    <button type="submit" @click="onLogin(email || '', password || '')">เข้าสู่ระบบ</button>
+    <button type="submit" @click="onLogin(email || '', password || '')" class="login-btn"
+      :disabled="isLoading">เข้าสู่ระบบ</button>
     <p>หรือ</p>
     <a class="register" @click="register">สมัครสมาชิก</a>
   </div>
@@ -25,6 +26,7 @@ import { useRouter } from 'vue-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { useUserNameStore } from '@/stores/counter';
+import { useUserUIDStore } from '@/stores/counter';
 
 defineOptions({
   name: 'loginForm'
@@ -34,22 +36,27 @@ const password = ref<string>()
 const router = useRouter();
 
 const loginUser = useUserNameStore();
+const loginUID = useUserUIDStore();
+const isLoading = ref<boolean>(false);
 
 const onLogin = async (email: string, password: string) => {
+  isLoading.value = true
   try {
     const LoginDredential = await signInWithEmailAndPassword(auth, email, password);
 
     const user = LoginDredential.user;
     loginUser.setUsername(<string>user.displayName)
+    loginUID.setUid(<string>user.uid);
     console.log(user.displayName)
+    console.log(loginUID.currentUid);
     console.log(loginUser);
 
   } catch (error) {
     alert('เข้าสู่ระบบไม่สำเร็จ')
     console.log(error);
+  }finally{
+    isLoading.value = false
   }
-
-
 
 }
 const register = () => {
@@ -78,6 +85,19 @@ const register = () => {
   border: 1px solid;
   padding: 2%;
   margin: 3%;
+  border-radius: 3vh;
+}
+
+.login-btn {
+  padding-inline: 1vw;
+  padding-block: 1vh;
+  border-radius: 10px;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.login-btn:active {
+  background-color: rgb(193, 192, 192);
 }
 
 .register {
