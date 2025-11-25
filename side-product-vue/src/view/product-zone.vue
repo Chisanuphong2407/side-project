@@ -3,27 +3,27 @@
     <!-- แสดงรายการ product -->
     <div class="search">
       <div class="search-block">
-        <input v-model="search" placeholder="ค้นหาสินค้า"  @input="onSearch(search, selectCatalog, selectUnit)" />
+        <input v-model="search" placeholder="ค้นหาสินค้า" @input="deBounceSearch(search, selectCatalog, selectUnit)" />
         <!-- <Icon icon="material-symbols:search" width="24" height="24" /> -->
       </div>
       <div class="catalog-block" v-if="allCatalog">
-        <select v-model="selectCatalog" @change="onSearch(search, selectCatalog, selectUnit)">
-          <option disabled value="" selected>--หมวดหมู่--</option>
+        <select v-model="selectCatalog" @change="deBounceSearch(search, selectCatalog, selectUnit)">
+          <option value="" selected>--หมวดหมู่--</option>
           <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
       </div>
       <div class="unit-block" v-if="allUnit">
-        <select v-model="selectUnit" @change="onSearch(search, selectCatalog, selectUnit)">
-          <option disabled value="" selected>--หน่วย--</option>
+        <select v-model="selectUnit" @change="deBounceSearch(search, selectCatalog, selectUnit)">
+          <option value="" selected>--หน่วย--</option>
           <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
         </select>
       </div>
-      <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch"/>
+      <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch" />
     </div>
     <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
         <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)"
-        @edit="editProduct" @delete="deleteProduct" class="product-list" />
+          @edit="editProduct" @delete="deleteProduct" class="product-list" />
       </div>
     </div>
     <div v-else class="empty">
@@ -41,8 +41,8 @@ import productList from './product-list.vue'
 import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { Icon } from '@iconify/vue'
-// import { doc,getDoc } from 'firebase/firestore'
-// import { db } from '@/firebase'
+import { useDebounceFn } from '@vueuse/core'
+// import { useDebounceFn,useEventListener } from '@vueuse/core'
 
 defineOptions({
   name: 'productZone',
@@ -106,6 +106,10 @@ const fetchProduct = async () => {
   }
 }
 
+const deBounceSearch = useDebounceFn((search: string, selectCatalog: string, selectUnit: string) => {
+  onSearch(search, selectCatalog, selectUnit)
+}, 500)
+
 const onSearch = async (search: string, selectCatalog: string, selectUnit: string) => {
   try {
     console.log('ID', uid)
@@ -122,9 +126,9 @@ const onSearch = async (search: string, selectCatalog: string, selectUnit: strin
 const resetSearch = () => {
   search.value = '';
   selectCatalog.value = '';
-  selectUnit.value ='';
-  selectItem.value= ''
-  onSearch('','','');
+  selectUnit.value = '';
+  selectItem.value = ''
+  onSearch('', '', '');
 }
 
 const selectItem = ref<string>()

@@ -34,6 +34,7 @@ export class ProductService {
     return data;
   }
 
+  //not agregrate
   async search(FetchProductDto: FetchProductDto): Promise<Product[] | null> {
     console.log('search');
     const condition: any = {};
@@ -41,7 +42,10 @@ export class ProductService {
     condition.ownerID = FetchProductDto.ownerID;
 
     if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
-      condition.productname = { $regex: FetchProductDto.productname };
+      condition.productname = {
+        $regex: FetchProductDto.productname,
+        $options: 'i',
+      };
     }
 
     if (FetchProductDto.catalog) {
@@ -58,6 +62,84 @@ export class ProductService {
       .populate('catalog')
       .populate('unit')
       .exec();
+  }
+
+  async agSearch(FetchProductDto: FetchProductDto) {
+    const condition: object[] = [];
+
+    if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
+      condition.push({
+        productname: {
+          $regex: FetchProductDto.productname,
+          $options: 'i',
+        },
+      });
+    }
+
+    if (FetchProductDto.catalog) {
+      condition.push({ catalog: FetchProductDto.catalog });
+    }
+
+    if (FetchProductDto.unit) {
+      condition.push({ unit: FetchProductDto.unit });
+    }
+
+    condition.push({ ownerID: FetchProductDto.ownerID });
+    const pipeline = [
+      {
+        $match: {
+          //----------------------------------------------------------
+          $and: condition,
+          //------------------------------------------------------------
+        },
+      },
+      {
+        $addFields: {
+          convertCatalog: { $toObjectId: '$catalog' },
+          convertUnit: { $toObjectId: '$unit' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'catalogs',
+          localField: 'convertCatalog',
+          foreignField: '_id',
+          as: 'catalogData',
+        },
+      },
+      {
+        $unwind: { path: '$catalogData' },
+      },
+      {
+        $lookup: {
+          from: 'units',
+          localField: 'convertUnit',
+          foreignField: '_id',
+          as: 'unitData',
+        },
+      },
+      {
+        $unwind: { path: '$unitData' },
+      },
+      {
+        $project: {
+          productname: '$productname',
+          description: '$description',
+          quantity: '$quantity',
+          unit: {
+            unitname: '$unitData.unitname',
+          },
+          price: '$price',
+          catalog: {
+            catalogName: '$catalogData.catalogName',
+          },
+          ownerID: '$ownerID',
+        },
+      },
+    ];
+
+    console.log(condition);
+    return this.productModel.aggregate(pipeline);
   }
 
   async update(

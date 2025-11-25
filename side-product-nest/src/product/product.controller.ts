@@ -30,7 +30,7 @@ export class ProductController {
 
   @Get('search')
   search(@Query() query: FetchProductDto) {
-    return this.productService.search(query);
+    return this.productService.agSearch(query);
   }
 
   @Get('all/:uid')

@@ -5,14 +5,14 @@
       <nav class="navigator">
         <div class="nav-block">
           <Icon icon="material-symbols:shopping-cart" width="24" height="24" class="icon" />
-          <router-link to="/" class="nav-item">สินค้าทั้งหมด</router-link>
+          <router-link to="/productZone" class="nav-item">สินค้าทั้งหมด</router-link>
         </div>
         <div class="nav-block">
-          <Icon icon="material-symbols:add-circle-outline-rounded" width="24" height="24" class="icon"/>
+          <Icon icon="material-symbols:add-circle-outline-rounded" width="24" height="24" class="icon" />
           <router-link to="/addCatalog" class="nav-item">เพิ่มหมวดหมู่</router-link>
         </div>
         <div class="nav-block">
-          <Icon icon="material-symbols:add-shopping-cart-sharp" width="24" height="24" class="icon"/>
+          <Icon icon="material-symbols:add-shopping-cart-sharp" width="24" height="24" class="icon" />
           <router-link to="/addProduct" class="nav-item">เพิ่มสินค้า</router-link>
         </div>
       </nav>
@@ -40,8 +40,11 @@ import { Icon } from '@iconify/vue';
     display: none;
   }
 
-  .sidebar-header {display: none;}
+  .sidebar-header {
+    display: none;
+  }
 }
+
 .navigator {
   display: flex;
   flex-direction: column;

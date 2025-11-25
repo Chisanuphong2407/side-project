@@ -19,6 +19,7 @@
     "@nestjs/common": "^11.1.8",
     "@nestjs/core": "^11.1.8",
     "@nestjs/platform-express": "^11.1.8",
+    "@vueuse/core": "^14.0.0",
     "axios": "^1.13.2",
     "firebase": "^12.6.0",
     "path": "^0.12.7",
