@@ -11,6 +11,7 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FetchProductDto } from './dto/fetch-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -27,9 +28,9 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
-  @Get('search/:text')
-  search(@Query('text') text: string) {
-    return this.productService.search(text);
+  @Get('search')
+  search(@Query() query: FetchProductDto) {
+    return this.productService.search(query);
   }
 
   @Get('all/:uid')

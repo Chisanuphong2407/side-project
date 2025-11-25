@@ -107,8 +107,6 @@ const onSubmitRegister = async (email: string, password: string) => {
       createdAt: new Date()    // เก็บเวลาที่สมัคร
     });
 
-
-
     await axios.post(`${URL}/user`, {
       uid: uid,
       username: username.value

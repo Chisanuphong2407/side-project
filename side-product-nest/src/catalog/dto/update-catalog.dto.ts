@@ -4,4 +4,8 @@ export class UpdateCatalogDto {
   @IsOptional()
   @IsString()
   readonly catalogName?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly ownerID?: string;
 }

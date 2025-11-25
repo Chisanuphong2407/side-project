@@ -22,8 +22,12 @@ export class CatalogService {
     return catalogs;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} catalog`;
+  findOne(id: string) {
+    const catalogs = this.catalogModel
+      .find({ ownerID: id })
+      .populate('_id')
+      .exec();
+    return catalogs;
   }
 
   update(id: number, updateCatalogDto: UpdateCatalogDto) {

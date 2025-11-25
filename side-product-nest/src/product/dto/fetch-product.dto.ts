@@ -1,7 +1,16 @@
+import { IsNotEmpty, IsOptional } from 'class-validator';
+
 export class FetchProductDto {
-  readonly productname: string;
+  @IsOptional()
+  productname?: string;
 
-  readonly unit: string;
+  @IsOptional()
+  unit?: string;
 
-  readonly catalog: string;
+  @IsOptional()
+  catalog?: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  ownerID: string;
 }

@@ -79,11 +79,11 @@ const product = ref({
 
 onMounted(async () => {
   try {
-    const unitData = await axios.get(`${BASE_URL}/unit`)
+    const unitData = await axios.get(`${BASE_URL}/unit/${uid}`)
     allUnit.value = unitData.data
     console.log(allUnit.value);
 
-    const catalogData = await axios.get(`${BASE_URL}/catalog`)
+    const catalogData = await axios.get(`${BASE_URL}/catalog/${uid}`)
     allCatalog.value = catalogData.data
 
     product.value.ownerID = uid

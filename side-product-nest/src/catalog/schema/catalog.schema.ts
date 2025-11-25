@@ -7,6 +7,9 @@ export type CatalogDocument = Catalog & Document;
 export class Catalog {
   @Prop({ type: Types.ObjectId, ref: 'Catalog', required: true })
   catalogName: string;
+
+  @Prop({ required: true })
+  ownerID: string;
 }
 
 export const CatalogSchema = SchemaFactory.createForClass(Catalog);

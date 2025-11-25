@@ -3,26 +3,27 @@
     <!-- แสดงรายการ product -->
     <div class="search">
       <div class="search-block">
-        <input v-model="search" placeholder="ค้นหาสินค้า" @change="onSearch(search || '')" />
-        <Icon icon="material-symbols:search" width="24" height="24" @click="onSearch(search || '')" />
+        <input v-model="search" placeholder="ค้นหาสินค้า"  @input="onSearch(search, selectCatalog, selectUnit)" />
+        <!-- <Icon icon="material-symbols:search" width="24" height="24" /> -->
       </div>
       <div class="catalog-block" v-if="allCatalog">
-        <select v-model="selectCatalog" >
+        <select v-model="selectCatalog" @change="onSearch(search, selectCatalog, selectUnit)">
           <option disabled value="" selected>--หมวดหมู่--</option>
-          <option v-for="c in allCatalog" :key="c._id" value="c._id">{{ c.catalogName }}</option>
+          <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
       </div>
       <div class="unit-block" v-if="allUnit">
-        <select v-model="selectUnit" >
+        <select v-model="selectUnit" @change="onSearch(search, selectCatalog, selectUnit)">
           <option disabled value="" selected>--หน่วย--</option>
-          <option v-for="c in allUnit" :key="c._id" value="c._id">{{ c.unitname }}</option>
+          <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
         </select>
       </div>
+      <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch"/>
     </div>
     <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
         <product-list v-if="product" :info="p" :selected-item="selectItem" @selected="selectedItem(p._id)"
-          @edit="editProduct" @delete="deleteProduct" class="product-list" />
+        @edit="editProduct" @delete="deleteProduct" class="product-list" />
       </div>
     </div>
     <div v-else class="empty">
@@ -60,12 +61,12 @@ interface Product {
 
 interface Catalog {
   _id: string;
-  catalogName:string;
+  catalogName: string;
 }
 
 interface Unit {
   _id: string;
-  unitname:string;
+  unitname: string;
 }
 
 const URL = import.meta.env.VITE_API_BASE_URL
@@ -74,7 +75,7 @@ const productStore = useProductIDStore()
 const userStore = useUserUIDStore();
 const uid = userStore.currentUid
 const router = useRouter()
-const search = ref<string>()
+const search = ref<string>('')
 
 const allCatalog = ref<Catalog[]>()
 const selectCatalog = ref<string>('')
@@ -89,32 +90,41 @@ onMounted(() => {
 const fetchProduct = async () => {
   try {
     //fetch product ทั้งหมดออกมา
-    console.log('url', URL)
+    // console.log('url', URL)
     const productfetch = await axios.get(`${URL}/product/all/${uid}`)
     console.log(productfetch)
 
     product.value = productfetch.data
 
-    const catalogData = await axios.get(`${URL}/catalog/`)
+    const catalogData = await axios.get(`${URL}/catalog/${uid}`)
     allCatalog.value = catalogData.data;
 
-    const unitData = await axios.get(`${URL}/unit/`)
+    const unitData = await axios.get(`${URL}/unit/${uid}`)
     allUnit.value = unitData.data;
   } catch (error) {
     console.log(error)
   }
 }
 
-const onSearch = async (search: string) => {
+const onSearch = async (search: string, selectCatalog: string, selectUnit: string) => {
   try {
-    const result = await axios.get(`${URL}/product/search/${search}`);
+    console.log('ID', uid)
+    const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}`);
 
     product.value = result.data;
-    if (product.value.length > 0) {
-    }
+
+    console.log(product.value)
   } catch (error) {
     console.log('searchError', error);
   }
+}
+
+const resetSearch = () => {
+  search.value = '';
+  selectCatalog.value = '';
+  selectUnit.value ='';
+  selectItem.value= ''
+  onSearch('','','');
 }
 
 const selectItem = ref<string>()
@@ -196,5 +206,14 @@ const deleteProduct = async (product: string) => {
 .search {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  margin-left: 15px;
+  margin-top: 15px;
+  gap: 20px;
+  /* justify-content: center; */
+}
+
+.search-block {
+  display: flex;
 }
 </style>

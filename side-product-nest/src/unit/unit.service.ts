@@ -21,8 +21,9 @@ export class UnitService {
     return units;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} unit`;
+  findOne(id: string) {
+    const units = this.unitModel.find({ ownerID: id }).populate('_id').exec();
+    return units;
   }
 
   update(id: number, updateUnitDto: UpdateUnitDto) {

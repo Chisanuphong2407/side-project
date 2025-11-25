@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -5,6 +6,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './schema/product.schema';
 import { productDocument } from './schema/product.schema';
 import { Model } from 'mongoose';
+import { FetchProductDto } from './dto/fetch-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -32,9 +34,30 @@ export class ProductService {
     return data;
   }
 
-  async search(text: string): Promise<Product[] | null> {
+  async search(FetchProductDto: FetchProductDto): Promise<Product[] | null> {
     console.log('search');
-    return this.productModel.find({ productname: { $regex: text } }).exec();
+    const condition: any = {};
+
+    condition.ownerID = FetchProductDto.ownerID;
+
+    if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
+      condition.productname = { $regex: FetchProductDto.productname };
+    }
+
+    if (FetchProductDto.catalog) {
+      condition.catalog = FetchProductDto.catalog;
+    }
+
+    if (FetchProductDto.unit) {
+      condition.unit = FetchProductDto.unit;
+    }
+
+    console.log(condition);
+    return this.productModel
+      .find(condition)
+      .populate('catalog')
+      .populate('unit')
+      .exec();
   }
 
   async update(

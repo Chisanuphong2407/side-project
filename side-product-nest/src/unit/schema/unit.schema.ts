@@ -7,6 +7,9 @@ export type UnitDocument = Unit & Document;
 export class Unit {
   @Prop({ type: Types.ObjectId, ref: 'Unit', required: true })
   unitname: string;
+
+  @Prop({ required: true })
+  ownerID: string;
 }
 
 export const UnitSchema = SchemaFactory.createForClass(Unit);

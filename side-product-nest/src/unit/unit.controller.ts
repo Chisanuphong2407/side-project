@@ -28,7 +28,7 @@ export class UnitController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.unitService.findOne(+id);
+    return this.unitService.findOne(id);
   }
 
   @Patch(':id')

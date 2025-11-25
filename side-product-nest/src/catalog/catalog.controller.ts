@@ -19,7 +19,7 @@ export class CatalogController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.catalogService.findOne(+id);
+    return this.catalogService.findOne(id);
   }
 
   @Patch(':id')
