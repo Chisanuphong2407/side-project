@@ -9,7 +9,10 @@
       <h3>รายละเอียดสินค้า:</h3>
       <p class="name">{{ info.description }}</p>
       <h3>จำนวนสินค้า:</h3>
-      <p class="name">{{ info.quantity }}</p>
+      <div class="quantity-block">
+        <p class="name">{{ info.quantity }}</p>
+        <p v-if="info.quantity <= 5" class="quantity-warning">สินค้าใกล้จะหมดแล้ว!!</p>
+      </div>
       <h3>หน่วย:</h3>
       <p class="name">{{ info.unit.unitname }}</p>
       <h3>ราคาสินค้า:</h3>
@@ -136,7 +139,7 @@ const deleteProduct = (productID: string) => {
 }
 
 .delete-button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .button-zone {
@@ -173,8 +176,22 @@ h3 {
 .name {
   font-size: 18px;
 }
+
 p {
   margin-block: 3px;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
+}
+
+.quantity-warning {
+  color: crimson;
+  font-size: 2vh;
+  align-self: center;
+}
+
+.quantity-block {
+  display: flex;
+  flex-direction: row;
+  gap: 1vw;
+  align-self: center;
 }
 </style>
