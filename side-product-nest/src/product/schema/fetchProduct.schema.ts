@@ -25,6 +25,9 @@ export class FetchProduct {
 
   @Prop()
   limit: number;
+
+  @Prop()
+  skip: number;
 }
 
 export const fetchProductSchema = SchemaFactory.createForClass(FetchProduct);

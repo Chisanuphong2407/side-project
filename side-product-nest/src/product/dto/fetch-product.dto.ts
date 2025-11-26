@@ -16,15 +16,19 @@ export class FetchProductDto {
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value == 'false')
+  @Transform(({ value }) => value === 'true' || value === 'false')
   favorite?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value == 'false')
+  @Transform(({ value }) => value === 'false' || value === 'true')
   createdAtASC?: boolean;
 
   @IsNumber()
   @Type(() => Number)
   limit: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  skip: number;
 }

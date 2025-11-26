@@ -4,31 +4,31 @@
     <div class="search">
       <div class="search-block">
         <input v-model="search" placeholder="ค้นหาสินค้า"
-          @input="deBounceSearch(search, selectCatalog, selectUnit, createdAt, itemPerPage)" />
+          @input="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage)" />
         <!-- <Icon icon="material-symbols:search" width="24" height="24" /> -->
       </div>
       <div class="catalog-block" v-if="allCatalog">
         <select v-model="selectCatalog"
-          @change="deBounceSearch(search, selectCatalog, selectUnit, createdAt, itemPerPage)">
+          @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage)">
           <option value="" selected>--หมวดหมู่--</option>
           <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
       </div>
       <div class="unit-block" v-if="allUnit">
         <select v-model="selectUnit"
-          @change="deBounceSearch(search, selectCatalog, selectUnit, createdAt, itemPerPage)">
+          @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage)">
           <option value="" selected>--หน่วย--</option>
           <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
         </select>
       </div>
       <div class="favorite">
         <input type="checkbox" id="favorite" v-model="isFavorite"
-          @input="deBounceSearch(search, selectCatalog, selectUnit, createdAt, itemPerPage)" />
+          @input="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage)" />
         <label for="favorite">ติดดาว</label>
       </div>
-      <select v-model="createdAt" @change="console.log(createdAt)">
-        <option :value="true" selected>วันที่เพิ่ม(ใหม่ที่สุด)</option>
-        <option :value="false">วันที่เพิ่ม(เก่าที่สุด)</option>
+      <select v-model="createdAt" @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage)">
+        <option :value='true' >วันที่เพิ่ม(ใหม่ที่สุด)</option>
+        <option :value='false'>วันที่เพิ่ม(เก่าที่สุด)</option>
       </select>
       <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch" />
     </div>
@@ -41,14 +41,25 @@
     <div v-else class="empty">
       <p class="empty-text">ไม่มีรายการสินค้าในขณะนี้</p>
     </div>
-    <div v-if="product.length > 0">
-      <select v-model="itemPerPage"
-        @change="deBounceSearch(search, selectCatalog, selectUnit, createdAt, itemPerPage)">
+    <div v-if="product.length > 0" class="pagination">
+      <select v-model="itemPerPage" @change=" () => {deBounceSearch(search, selectCatalog, selectUnit, itemPerPage); page = 1}">
         <option selected value="1">1 รายการ/หน้า</option>
         <option selected value="2">2 รายการ/หน้า</option>
         <option selected value="3">3 รายการ/หน้า</option>
         <option selected value="4">4 รายการ/หน้า</option>
       </select>
+      <div class="page">
+        <div @click="pageChange(true)" class="page-btn-left">
+          prev
+        </div>
+        <div class="page-number">
+          {{ page }}/{{ maxPage }}
+        </div>
+
+        <div @click="pageChange(false)" class="page-btn-right">
+          next
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -107,11 +118,13 @@ const selectUnit = ref<string>('')
 const isFavorite = ref<boolean>(false);
 const createdAt = ref<boolean>(true);
 const itemPerPage = ref<number>(1)
+const page = ref<number>(1);
+const maxPage = ref<number>(0)
 
 onMounted(() => {
   fetchProduct()
   // fetchUser()
-  onSearch('', '', '', createdAt.value,itemPerPage.value);
+  onSearch('', '', '', itemPerPage.value);
 })
 
 const fetchProduct = async () => {
@@ -133,20 +146,24 @@ const fetchProduct = async () => {
   }
 }
 
-const deBounceSearch = useDebounceFn((search: string, selectCatalog: string, selectUnit: string, createdAtASC: boolean, itemPerPage: number) => {
-  onSearch(search, selectCatalog, selectUnit, createdAtASC,itemPerPage)
+const deBounceSearch = useDebounceFn((search: string, selectCatalog: string, selectUnit: string, itemPerPage: number) => {
+  onSearch(search, selectCatalog, selectUnit, itemPerPage)
+  console.log(createdAt.value)
 }, 500)
 
-const onSearch = async (search: string, selectCatalog: string, selectUnit: string, createdAtASC: boolean, itemPerPage: number) => {
+const onSearch = async (search: string, selectCatalog: string, selectUnit: string, itemPerPage: number) => {
   try {
     console.log('ID', uid)
+    const skip: number = itemPerPage * (page.value- 1);
     if (isFavorite.value == true) {
       console.log('fav');
-      const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}&favorite=${isFavorite.value}&createdAtASC=${createdAtASC}&limit=${itemPerPage}`);
-      product.value = result.data;
+      const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}&favorite=${isFavorite.value}&createdAtASC=${createdAt.value}&limit=${itemPerPage}&skip=${skip}`);
+      product.value = result.data.data;
+      maxPage.value = Math.ceil(result.data.count / itemPerPage);
     } else {
-      const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}&createdAtASC=${createdAtASC}&limit=${itemPerPage}`);
-      product.value = result.data;
+      const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}&createdAtASC=${createdAt.value}&limit=${itemPerPage}&skip=${skip}`);
+      product.value = result.data.data;
+      maxPage.value = Math.ceil(result.data.count / itemPerPage);
     }
 
 
@@ -163,7 +180,7 @@ const resetSearch = () => {
   selectItem.value = ''
   isFavorite.value = false;
   createdAt.value = (true)
-  onSearch('', '', '', createdAt.value,itemPerPage.value);
+  onSearch('', '', '', itemPerPage.value);
 }
 
 const selectItem = ref<string>()
@@ -196,13 +213,23 @@ const deleteProduct = async (product: string) => {
 const likeProduct = async (productID: string) => {
   try {
     await axios.patch(`${URL}/product/favorite/${productID}`);
-    onSearch(search.value, selectCatalog.value, selectUnit.value, createdAt.value,itemPerPage.value)
+    onSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value)
   } catch (error) {
     alert('like error');
     console.log(error);
   }
 }
 
+
+const pageChange = (prev: boolean) => {
+  if (prev == true && page.value > 1) {
+    page.value = page.value - 1;
+    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value)
+  } else if (prev == false && page.value < maxPage.value) {
+    page.value = page.value + 1
+    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value)
+  }
+}
 </script>
 
 <style scoped>
@@ -270,5 +297,43 @@ const likeProduct = async (productID: string) => {
 .favorite {
   display: flex;
   align-items: center;
+}
+
+.pagination {
+  display: flex;
+  flex-direction: row;
+  gap: 2vw;
+  padding: 1vw;
+}
+
+.page {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2vh;
+  border: 2px solid black;
+  border-radius: 2vw;
+}
+
+.page-btn-left {
+  border-top-left-radius: 2vw;
+  border-bottom-left-radius: 2vw;
+  padding: 2vh;
+  padding-inline: 3vh;
+}
+
+.page-btn-left:active {
+  background-color: rgb(213, 213, 191);
+}
+
+.page-btn-right {
+    border-top-right-radius: 2vw;
+  border-bottom-right-radius: 2vw;
+  padding: 2vh;
+  padding-inline: 3vh;
+}
+
+.page-btn-right:active {
+  background-color: rgb(213, 213, 191);
 }
 </style>

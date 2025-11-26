@@ -68,7 +68,9 @@ export class ProductService {
     const condition: object[] = [];
     const sort: any = {};
     const limit: number = FetchProductDto.limit;
-    console.log('dto', FetchProductDto.favorite);
+    const skip: number = FetchProductDto.skip;
+    console.log('dto', FetchProductDto.createdAtASC);
+    console.log(skip);
 
     if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
       condition.push({
@@ -111,66 +113,81 @@ export class ProductService {
         },
       },
       {
-        $addFields: {
-          convertCatalog: { $toObjectId: '$catalog' },
-          convertUnit: { $toObjectId: '$unit' },
-          createdThai: {
-            $dateToString: {
-              date: '$createdAt',
-              timezone: 'Asia/Bangkok',
-              format: 'วันที่ %d/%m/%Y เวลา %H:%M',
+        $facet: {
+          data: [
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $addFields: {
+                convertCatalog: { $toObjectId: '$catalog' },
+                convertUnit: { $toObjectId: '$unit' },
+                createdThai: {
+                  $dateToString: {
+                    date: '$createdAt',
+                    timezone: 'Asia/Bangkok',
+                    format: 'วันที่ %d/%m/%Y เวลา %H:%M',
+                  },
+                },
+              },
             },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'catalogs',
-          localField: 'convertCatalog',
-          foreignField: '_id',
-          as: 'catalogData',
-        },
-      },
-      {
-        $unwind: { path: '$catalogData' },
-      },
-      {
-        $lookup: {
-          from: 'units',
-          localField: 'convertUnit',
-          foreignField: '_id',
-          as: 'unitData',
-        },
-      },
-      {
-        $unwind: { path: '$unitData' },
-      },
-      {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        $sort: sort,
-      },
-      {
-        $project: {
-          productname: '$productname',
-          description: '$description',
-          quantity: '$quantity',
-          unit: {
-            unitname: '$unitData.unitname',
-          },
-          price: '$price',
-          catalog: {
-            catalogName: '$catalogData.catalogName',
-          },
-          ownerID: '$ownerID',
-          createThai: '$createdThai',
-          favorite: '$favorite',
+            {
+              $lookup: {
+                from: 'catalogs',
+                localField: 'convertCatalog',
+                foreignField: '_id',
+                as: 'catalogData',
+              },
+            },
+            {
+              $unwind: { path: '$catalogData' },
+            },
+            {
+              $lookup: {
+                from: 'units',
+                localField: 'convertUnit',
+                foreignField: '_id',
+                as: 'unitData',
+              },
+            },
+            {
+              $unwind: { path: '$unitData' },
+            },
+            {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              $sort: sort,
+            },
+            {
+              $project: {
+                productname: '$productname',
+                description: '$description',
+                quantity: '$quantity',
+                unit: {
+                  unitname: '$unitData.unitname',
+                },
+                price: '$price',
+                catalog: {
+                  catalogName: '$catalogData.catalogName',
+                },
+                ownerID: '$ownerID',
+                createThai: '$createdThai',
+                favorite: '$favorite',
+              },
+            },
+          ],
+          count: [{ $count: 'total' }],
         },
       },
     ];
 
     console.log(condition);
     console.log(sort);
-    return this.productModel.aggregate(pipeline as any).limit(limit);
+    const result = await this.productModel.aggregate(pipeline).exec();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data = result[0].data;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const count = result[0].count[0].total;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    return { data, count };
   }
 
   async update(
