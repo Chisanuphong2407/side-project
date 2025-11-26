@@ -38,6 +38,11 @@ export class ProductController {
     return this.productService.findAll(uid);
   }
 
+  @Patch('favorite/:id')
+  favorite(@Param('id') id: string) {
+    return this.productService.favorite(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);

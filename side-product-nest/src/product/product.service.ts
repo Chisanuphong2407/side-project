@@ -66,6 +66,9 @@ export class ProductService {
 
   async agSearch(FetchProductDto: FetchProductDto) {
     const condition: object[] = [];
+    const sort: any = {};
+    const limit: number = FetchProductDto.limit;
+    console.log('dto', FetchProductDto.favorite);
 
     if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
       condition.push({
@@ -84,6 +87,20 @@ export class ProductService {
       condition.push({ unit: FetchProductDto.unit });
     }
 
+    if (FetchProductDto.favorite == true) {
+      console.log(FetchProductDto.favorite);
+      sort.favorite = -1;
+    }
+
+    if (FetchProductDto.createdAtASC) {
+      if (FetchProductDto.createdAtASC == true) {
+        console.log('asc');
+        sort.createdAt = 1;
+      } else {
+        sort.createdAt = -1;
+      }
+    }
+    sort.productname = 1;
     condition.push({ ownerID: FetchProductDto.ownerID });
     const pipeline = [
       {
@@ -97,6 +114,13 @@ export class ProductService {
         $addFields: {
           convertCatalog: { $toObjectId: '$catalog' },
           convertUnit: { $toObjectId: '$unit' },
+          createdThai: {
+            $dateToString: {
+              date: '$createdAt',
+              timezone: 'Asia/Bangkok',
+              format: 'วันที่ %d/%m/%Y เวลา %H:%M',
+            },
+          },
         },
       },
       {
@@ -122,6 +146,10 @@ export class ProductService {
         $unwind: { path: '$unitData' },
       },
       {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        $sort: sort,
+      },
+      {
         $project: {
           productname: '$productname',
           description: '$description',
@@ -134,12 +162,15 @@ export class ProductService {
             catalogName: '$catalogData.catalogName',
           },
           ownerID: '$ownerID',
+          createThai: '$createdThai',
+          favorite: '$favorite',
         },
       },
     ];
 
     console.log(condition);
-    return this.productModel.aggregate(pipeline);
+    console.log(sort);
+    return this.productModel.aggregate(pipeline as any).limit(limit);
   }
 
   async update(
@@ -148,6 +179,26 @@ export class ProductService {
   ): Promise<Product | null> {
     const data = this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .exec();
+    return data;
+  }
+
+  async favorite(id: string): Promise<Product | null> {
+    console.log(id);
+    const data = this.productModel
+      .findByIdAndUpdate(
+        id,
+        [
+          {
+            $set: {
+              favorite: { $not: '$favorite' },
+            },
+          },
+        ],
+        {
+          new: true,
+        },
+      )
       .exec();
     return data;
   }

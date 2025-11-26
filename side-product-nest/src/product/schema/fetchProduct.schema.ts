@@ -16,6 +16,15 @@ export class FetchProduct {
 
   @Prop({ required: true })
   ownerID: string;
+
+  @Prop()
+  favorite: boolean;
+
+  @Prop()
+  createdAtASC: boolean;
+
+  @Prop()
+  limit: number;
 }
 
 export const fetchProductSchema = SchemaFactory.createForClass(FetchProduct);

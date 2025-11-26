@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class FetchProductDto {
   @IsOptional()
@@ -10,7 +11,20 @@ export class FetchProductDto {
   @IsOptional()
   catalog?: string;
 
-  @IsOptional()
   @IsNotEmpty()
   ownerID: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value == 'false')
+  favorite?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value == 'false')
+  createdAtASC?: boolean;
+
+  @IsNumber()
+  @Type(() => Number)
+  limit: number;
 }

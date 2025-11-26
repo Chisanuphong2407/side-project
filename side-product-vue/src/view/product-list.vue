@@ -3,6 +3,7 @@
     <div v-if="info" @click="onClick(info._id)" class="product-title">
       <!-- <div>{{ info._id }}</div> -->
       <div class="product-name">{{ info.productname }}</div>
+      <!-- <div class="product-name">{{ info.favorite }}</div> -->
       <img v-if="picURL" :src="picURL" alt="Product Image" class="product-image" />
     </div>
     <div v-if="selectedItem == info._id" class="productDetails">
@@ -19,13 +20,22 @@
       <p class="name">{{ info.price }}</p>
       <h3>หมวดหมู่:</h3>
       <p class="name">{{ info.catalog.catalogName }}</p>
-      <!-- <h3>เจ้าของสินค้า:</h3>
-      <p class="name">{{ info.ownerID }}</p> -->
+      <h3>เวลา:</h3>
+      <p class="name">{{ info.createThai }}</p>
       <div class="button-zone">
         <button class="edit-button" @click="editProduct(info._id)">แก้ไข</button>
         <Icon icon="material-symbols:delete-outline-rounded" width="30px" height="30px" color="#C20506"
           @click="deleteProduct(info._id)" class="delete-button" />
       </div>
+    </div>
+    <div class="product-status">
+      <Transition name="fade" mode="out-in">
+        <Icon v-if="info.favorite == false" key="false" icon="material-symbols:kid-star-outline-sharp" width="30"
+          height="30" style="margin: 2vh; margin-block-start: 3vh;" @click="onLike(info._id)" />
+        <Icon v-else key="true" icon="material-symbols:kid-star-sharp" width="30" height="30"
+          style="color: #ebf304; stroke: black; stroke-width: 2px; margin: 2vh; margin-block-start: 3vh;"
+          @click="onLike(info._id)" />
+      </Transition>
     </div>
   </div>
 </template>
@@ -40,7 +50,7 @@ defineOptions({
   name: "productList",
 })
 
-const emits = defineEmits(['selected', 'edit', 'delete']);
+const emits = defineEmits(['selected', 'edit', 'delete', 'like']);
 
 const props = defineProps({
   info: {
@@ -80,6 +90,10 @@ const editProduct = (productID: string) => {
 const deleteProduct = (productID: string) => {
   emits('delete', productID);
 }
+
+const onLike = (productID: string) => {
+  emits('like', productID)
+}
 </script>
 
 <style scoped>
@@ -109,7 +123,7 @@ const deleteProduct = (productID: string) => {
   transition: all 0.3s ease;
 }
 
-.product-image:hover {
+.product-image:focus {
   height: 30vh;
   width: 20vw;
 }
@@ -193,5 +207,20 @@ p {
   flex-direction: row;
   gap: 1vw;
   align-self: center;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.1s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.product-status {
+  background-color: #fff2dd;
+  cursor: pointer;
 }
 </style>
