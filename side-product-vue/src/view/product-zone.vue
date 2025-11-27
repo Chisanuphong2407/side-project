@@ -48,7 +48,7 @@
         <option value="false">วันที่เพิ่ม(เก่าที่สุด)</option>
       </select>
       <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch" />
-      <Icon icon="eos-icons:loading" width="24" height="24" />
+      <!-- <Icon icon="eos-icons:loading" width="24" height="24" /> -->
     </div>
     <div v-if="product.length > 0" class="product-container">
       <div v-for="p in product" :key="p._id" class="allProduct">
