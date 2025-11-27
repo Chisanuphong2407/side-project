@@ -20,7 +20,7 @@
       <p class="name">{{ info.price }}</p>
       <h3>หมวดหมู่:</h3>
       <p class="name">{{ info.catalog.catalogName }}</p>
-      <h3>เวลา:</h3>
+      <h3>วัน เวลาที่สร้าง:</h3>
       <p class="name">{{ info.createThai }}</p>
       <div class="button-zone">
         <button class="edit-button" @click="editProduct(info._id)">แก้ไข</button>
@@ -123,7 +123,7 @@ const onLike = (productID: string) => {
   transition: all 0.3s ease;
 }
 
-.product-image:focus {
+.product-image:active{
   height: 30vh;
   width: 20vw;
 }
