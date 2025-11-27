@@ -13,6 +13,7 @@
         <select
           v-model="selectCatalog"
           @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)"
+          style="cursor: pointer"
         >
           <option value="" selected>--หมวดหมู่--</option>
           <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
@@ -22,6 +23,7 @@
         <select
           v-model="selectUnit"
           @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)"
+          style="cursor: pointer"
         >
           <option value="" selected>--หน่วย--</option>
           <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
@@ -33,12 +35,14 @@
           id="favorite"
           v-model="isFavorite"
           @input="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)"
+          style="cursor: pointer"
         />
         <label for="favorite">ติดดาว</label>
       </div>
       <select
         v-model="createdAt"
         @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)"
+        style="cursor: pointer"
       >
         <option value="true">วันที่เพิ่ม(ใหม่ที่สุด)</option>
         <option value="false">วันที่เพิ่ม(เก่าที่สุด)</option>
@@ -63,25 +67,27 @@
     <div v-else class="empty">
       <p class="empty-text">ไม่มีรายการสินค้าในขณะนี้</p>
     </div>
-     <div v-if="product.length > 0" class="pagination">
-      <select v-model="itemPerPage"
-        @change="() => { deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt); page = 1 }">
+    <div v-if="product.length > 0" class="pagination">
+      <select
+        v-model="itemPerPage"
+        @change="
+          () => {
+            deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)
+            page = 1
+          }
+        "
+        class="item-per-page-select"
+      >
         <option selected value="1">1 รายการ/หน้า</option>
         <option selected value="2">2 รายการ/หน้า</option>
         <option selected value="3">3 รายการ/หน้า</option>
         <option selected value="4">4 รายการ/หน้า</option>
       </select>
       <div class="page">
-        <div @click="pageChange(true)" class="page-btn-left">
-          prev
-        </div>
-        <div class="page-number">
-          {{ page }}/{{ maxPage }}
-        </div>
+        <div @click="pageChange(true)" class="page-btn-left">prev</div>
+        <div class="page-number">{{ page }}/{{ maxPage }}</div>
 
-        <div @click="pageChange(false)" class="page-btn-right">
-          next
-        </div>
+        <div @click="pageChange(false)" class="page-btn-right">next</div>
       </div>
     </div>
   </div>
@@ -371,6 +377,7 @@ const pageChange = (prev: boolean) => {
 }
 
 .page-btn-left {
+  cursor: pointer;
   border-top-left-radius: 2vw;
   border-bottom-left-radius: 2vw;
   padding: 2vh;
@@ -382,6 +389,7 @@ const pageChange = (prev: boolean) => {
 }
 
 .page-btn-right {
+  cursor: pointer;
   border-top-right-radius: 2vw;
   border-bottom-right-radius: 2vw;
   padding: 2vh;
@@ -392,7 +400,8 @@ const pageChange = (prev: boolean) => {
   background-color: rgb(250, 229, 201);
 }
 
-.item-per-page {
+.item-per-page-select {
+  cursor: pointer;
   border-radius: 5px;
   padding-inline: 10px;
 }
