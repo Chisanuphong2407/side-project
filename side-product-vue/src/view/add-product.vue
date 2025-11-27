@@ -46,11 +46,13 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { onMounted } from 'vue'
 import { db } from '@/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 import { useUserUIDStore } from '@/stores/counter'
+import productService from '@/api/product-service'
+import catalogService from '@/api/catalog-service'
+import unitService from '@/api/unit-service'
 
 defineOptions({
   name: 'addProduct',
@@ -59,7 +61,6 @@ defineOptions({
 const previewPath = ref<string>('')
 const isloading = ref<boolean>(false)
 const isSuccess = ref<boolean>(false)
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const uidStore = useUserUIDStore();
 const uid = <string>uidStore.currentUid;
@@ -79,12 +80,11 @@ const product = ref({
 
 onMounted(async () => {
   try {
-    const unitData = await axios.get(`${BASE_URL}/unit/${uid}`)
-    allUnit.value = unitData.data
-    console.log(allUnit.value);
+   const catalogData = await catalogService.allCatalog(uid);
+    allCatalog.value = catalogData.data;
 
-    const catalogData = await axios.get(`${BASE_URL}/catalog/${uid}`)
-    allCatalog.value = catalogData.data
+    const unitData = await unitService.allUnit(uid);
+    allUnit.value = unitData.data;
 
     product.value.ownerID = uid
 
@@ -215,9 +215,7 @@ const submitProduct = async () => {
     return
   }
   try {
-    // ส่งคำขอ POST โดยระบุ Header 'Content-Type': 'multipart/form-data'
-    //    (Axios จะจัดการให้เองถ้าเป็น FormData)
-    const result = await axios.post(`${BASE_URL}/product`, {
+    const result = await productService.addProduct({
       productname: product.value.productname,
       description: product.value.description,
       quantity: product.value.quantity,

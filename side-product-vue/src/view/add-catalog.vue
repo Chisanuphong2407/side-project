@@ -23,8 +23,9 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { useUserUIDStore } from '@/stores/counter'
+import catalogService from '@/api/catalog-service'
+import unitService from '@/api/unit-service'
 
 defineOptions({
   name: 'addCatalog',
@@ -32,7 +33,6 @@ defineOptions({
 const catalog = ref<string>('')
 const unit = ref<string>('')
 const isLoading = ref(false)
-const URL = import.meta.env.VITE_API_BASE_URL
 const uidStore = useUserUIDStore();
 const uid = uidStore.currentUid;
 
@@ -42,17 +42,17 @@ const submitCatalog = async () => {
     isLoading.value = true
     try {
       if (unit.value != '' && catalog.value != '') {
-        await axios.post(`${URL}/unit`, { unitname: unit.value ,ownerID: uid})
-        await axios.post(`${URL}/catalog`, { catalogName: catalog.value ,ownerID: uid})
+        await unitService.addUnit({ unitname: unit.value, ownerID: uid });
+        await catalogService.addCatalog({ catalogName: catalog.value, ownerID: uid });
+
         alert('บันทึกหมวดหมู่และหน่วยสำเร็จ')
         isLoading.value = false
       } else if (unit.value !== '') {
-        // formUnit.append('unitname', unit.value)
-        await axios.post(`${URL}/unit`, { unitname: unit.value ,ownerID: uid})
+        await unitService.addUnit({ catalogName: catalog.value, ownerID: uid });
         alert('เพิ่มหน่วยสำเร็จ')
         isLoading.value = false
       } else if (catalog.value != '') {
-        await axios.post(`${URL}/catalog`, { catalogName: catalog.value ,ownerID: uid})
+        await unitService.addUnit({ unitname: unit.value, ownerID: uid });
         alert('เพิ่มหมวดหมู่สำเร็จ')
         isLoading.value = false
       }

@@ -47,10 +47,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, toRaw, unref } from 'vue'
-import axios from 'axios'
-import { useRouter ,useRoute} from 'vue-router'
+import { useUserUIDStore } from '@/stores/counter'
+import { useRouter, useRoute } from 'vue-router'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
+import productService from '@/api/product-service'
+import catalogService from '@/api/catalog-service'
+import unitService from '@/api/unit-service'
 
 // กำหนดชื่อ Component (Optional: จำเป็นถ้าใช้ KeepAlive หรืออยากเห็นชื่อใน DevTools)
 defineOptions({
@@ -59,8 +62,9 @@ defineOptions({
 
 const router = useRouter()
 const route = useRoute();
+const uidStore = useUserUIDStore();
+const uid = <string>uidStore.currentUid;
 const productID: string = <string>route.params.id;
-const URL = import.meta.env.VITE_API_BASE_URL
 // State
 const product = ref()
 
@@ -77,15 +81,15 @@ const photoOBJ = ref()
 onMounted(async () => {
   console.log(productID)
   try {
-    const productData = await axios.get(`${URL}/product/get/${productID}`)
+    const productData = await productService.getProduct(productID)
     product.value = productData.data;
     console.log(product.value)
 
-    const unitData = await axios.get(`${URL}/unit`)
-    allUnit.value = unitData.data
+    const catalogData = await catalogService.allCatalog(uid);
+    allCatalog.value = catalogData.data;
 
-    const catalogData = await axios.get(`${URL}/catalog`)
-    allCatalog.value = catalogData.data
+    const unitData = await unitService.allUnit(uid);
+    allUnit.value = unitData.data;
 
     console.log(productID);
     const userRef = doc(db, 'ProductPic', productID);
@@ -218,7 +222,7 @@ const submitProduct = async () => {
   console.log(sendData);
 
   try {
-    await axios.patch(`${URL}/product/${productID}`, sendData)
+    await productService.editProduct(productID, sendData)
     const imageRef = doc(db, "ProductPic", productID || '');
 
     console.log('photo', photoOBJ.value)

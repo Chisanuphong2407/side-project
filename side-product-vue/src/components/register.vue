@@ -36,7 +36,6 @@ import { ref } from 'vue'
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/index'
-// import axios from 'axios';
 import userService from '@/api/user-service';
 
 defineOptions({
@@ -88,11 +87,6 @@ const onSubmitRegister = async (email: string, password: string) => {
       phone: phone.value,
       createdAt: new Date()    // เก็บเวลาที่สมัคร
     });
-
-    // await axios.post(`${URL}/user`, {
-    //   uid: uid,
-    //   username: username.value
-    // })
 
     await userService.userRegister({
       uid: uid,

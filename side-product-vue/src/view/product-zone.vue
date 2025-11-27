@@ -8,13 +8,15 @@
         <!-- <Icon icon="material-symbols:search" width="24" height="24" /> -->
       </div>
       <div class="catalog-block" v-if="allCatalog">
-        <select v-model="selectCatalog" @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)">
+        <select v-model="selectCatalog"
+          @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)">
           <option value="" selected>--หมวดหมู่--</option>
           <option v-for="c in allCatalog" :key="c._id" :value="c._id">{{ c.catalogName }}</option>
         </select>
       </div>
       <div class="unit-block" v-if="allUnit">
-        <select v-model="selectUnit" @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)">
+        <select v-model="selectUnit"
+          @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)">
           <option value="" selected>--หน่วย--</option>
           <option v-for="u in allUnit" :key="u._id" :value="u._id">{{ u.unitname }}</option>
         </select>
@@ -25,8 +27,8 @@
         <label for="favorite">ติดดาว</label>
       </div>
       <select v-model="createdAt" @change="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)">
-        <option value="true" >วันที่เพิ่ม(ใหม่ที่สุด)</option>
-        <option value="false" >วันที่เพิ่ม(เก่าที่สุด)</option>
+        <option value="true">วันที่เพิ่ม(ใหม่ที่สุด)</option>
+        <option value="false">วันที่เพิ่ม(เก่าที่สุด)</option>
       </select>
       <Icon icon="material-symbols:refresh" width="30" height="30" @click="resetSearch" />
     </div>
@@ -65,7 +67,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { useProductIDStore, useUserUIDStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
 import productList from './product-list.vue'
@@ -73,7 +74,9 @@ import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { Icon } from '@iconify/vue'
 import { useDebounceFn } from '@vueuse/core'
-// import { useDebounceFn,useEventListener } from '@vueuse/core'
+import productService from '@/api/product-service'
+import catalogService from '@/api/catalog-service'
+import unitService from '@/api/unit-service'
 
 defineOptions({
   name: 'productZone',
@@ -102,11 +105,10 @@ interface Unit {
   unitname: string;
 }
 
-const URL = import.meta.env.VITE_API_BASE_URL
 const product = ref<Product[]>([])
 const productStore = useProductIDStore()
 const userStore = useUserUIDStore();
-const uid = userStore.currentUid
+const uid = <string>userStore.currentUid
 const router = useRouter()
 const search = ref<string>('')
 
@@ -122,39 +124,32 @@ const maxPage = ref<number>(0)
 
 onMounted(() => {
   fetchProduct()
-  // fetchUser()
-  onSearch('', '', '', itemPerPage.value,createdAt.value);
+  onSearch('', '', '', itemPerPage.value, createdAt.value);
 })
 
 const fetchProduct = async () => {
   try {
-    //fetch product ทั้งหมดออกมา
-    // console.log('url', URL)
-    // const productfetch = await axios.get(`${URL}/product/all/${uid}`)
-    // console.log(productfetch)
-
-    // product.value = productfetch.data
-
-    const catalogData = await axios.get(`${URL}/catalog/${uid}`)
+    const catalogData = await catalogService.allCatalog(uid);
     allCatalog.value = catalogData.data;
 
-    const unitData = await axios.get(`${URL}/unit/${uid}`)
+    const unitData = await unitService.allUnit(uid);
     allUnit.value = unitData.data;
   } catch (error) {
     console.log(error)
   }
 }
 
-const deBounceSearch = useDebounceFn((search: string, selectCatalog: string, selectUnit: string, itemPerPage: number,createdAtASC) => {
-  onSearch(search, selectCatalog, selectUnit, itemPerPage,createdAtASC)
+const deBounceSearch = useDebounceFn((search: string, selectCatalog: string, selectUnit: string, itemPerPage: number, createdAtASC) => {
+  onSearch(search, selectCatalog, selectUnit, itemPerPage, createdAtASC)
   console.log(createdAt.value)
 }, 500)
 
 const onSearch = async (search: string, selectCatalog: string, selectUnit: string, itemPerPage: number, createdAtASC: boolean) => {
   try {
     console.log('ID', uid)
+    //uid,favorite,skip
     const skip: number = itemPerPage * (page.value - 1);
-    const result = await axios.get(`${URL}/product/search?productname=${search}&catalog=${selectCatalog}&unit=${selectUnit}&ownerID=${uid}&favorite=${isFavorite.value}&createdAtASC=${createdAtASC}&limit=${itemPerPage}&skip=${skip}`);
+    const result = await productService.searchProduct(search, selectCatalog, selectUnit, itemPerPage, createdAtASC, uid, isFavorite.value, skip)
     product.value = result.data.data;
     maxPage.value = Math.ceil(result.data.count / itemPerPage);
 
@@ -171,7 +166,7 @@ const resetSearch = () => {
   selectItem.value = ''
   isFavorite.value = false;
   createdAt.value = (true)
-  onSearch('', '', '', itemPerPage.value,createdAt.value);
+  onSearch('', '', '', itemPerPage.value, createdAt.value);
 }
 
 const selectItem = ref<string>()
@@ -191,10 +186,10 @@ const editProduct = (product: string) => {
 
 const deleteProduct = async (product: string) => {
   try {
-    await axios.delete(`${URL}/product/${product}`);
+    await productService.deleteProduct(product);
 
     await deleteDoc(doc(db, "ProductPic", product))
-    fetchProduct();
+    onSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value, createdAt.value)
   } catch (error) {
     console.log(error);
     alert('ลบไม่สำเร็จ');
@@ -203,8 +198,8 @@ const deleteProduct = async (product: string) => {
 
 const likeProduct = async (productID: string) => {
   try {
-    await axios.patch(`${URL}/product/favorite/${productID}`);
-    onSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value,createdAt.value)
+    await productService.likeProduct(productID);
+    onSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value, createdAt.value)
   } catch (error) {
     alert('like error');
     console.log(error);
@@ -215,10 +210,10 @@ const likeProduct = async (productID: string) => {
 const pageChange = (prev: boolean) => {
   if (prev == true && page.value > 1) {
     page.value = page.value - 1;
-    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value,createdAt.value)
+    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value, createdAt.value)
   } else if (prev == false && page.value < maxPage.value) {
     page.value = page.value + 1
-    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value,createdAt.value)
+    deBounceSearch(search.value, selectCatalog.value, selectUnit.value, itemPerPage.value, createdAt.value)
   }
 }
 </script>
