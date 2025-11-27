@@ -20,7 +20,7 @@
       <p class="name">{{ info.price }}</p>
       <h3>หมวดหมู่:</h3>
       <p class="name">{{ info.catalog.catalogName }}</p>
-      <h3>วัน เวลาที่สร้าง:</h3>
+      <h3>วัน เวลาที่เพิ่มสินค้า:</h3>
       <p class="name">{{ info.createThai }}</p>
       <div class="button-zone">
         <button class="edit-button" @click="editProduct(info._id)">แก้ไข</button>

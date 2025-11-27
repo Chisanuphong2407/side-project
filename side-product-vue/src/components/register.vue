@@ -66,11 +66,12 @@ const onSubmitRegister = async (email: string, password: string) => {
     //เก็บข้อมูลทั้งหมดของ account ที่พึ่งสร้าง
     const user = userCredential.user;
 
+    //user เก็บ uid ไว้
+    const uid = user.uid;
+
     await updateProfile(user, { displayName: username.value })
     console.log(user);
     console.log('credent', userCredential);
-    //user เก็บ uid ไว้
-    const uid = user.uid;
 
     //2. เก็บข้อมูล user เข้า db
     //doc(database,ชื่อ collection,ชื่อ doc)

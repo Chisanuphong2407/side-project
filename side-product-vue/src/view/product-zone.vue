@@ -8,7 +8,6 @@
           placeholder="ค้นหาสินค้า"
           @input="deBounceSearch(search, selectCatalog, selectUnit, itemPerPage, createdAt)"
         />
-        <!-- <Icon icon="material-symbols:search" width="24" height="24" /> -->
       </div>
       <div class="catalog-block" v-if="allCatalog">
         <select
