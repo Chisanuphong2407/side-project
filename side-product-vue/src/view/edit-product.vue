@@ -47,9 +47,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, toRaw, unref } from 'vue'
-import { useProductIDStore } from '@/stores/counter'
 import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { useRouter ,useRoute} from 'vue-router'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 
@@ -58,9 +57,9 @@ defineOptions({
   name: 'editProduct'
 })
 
-const productStore = useProductIDStore()
 const router = useRouter()
-const productID = productStore.currentProductID
+const route = useRoute();
+const productID: string = <string>route.params.id;
 const URL = import.meta.env.VITE_API_BASE_URL
 // State
 const product = ref()
@@ -89,7 +88,7 @@ onMounted(async () => {
     allCatalog.value = catalogData.data
 
     console.log(productID);
-    const userRef = doc(db, 'ProductPic', productID || '');
+    const userRef = doc(db, 'ProductPic', productID);
 
     const docSnap = await getDoc(userRef);
 

@@ -16,7 +16,7 @@ const routes = [
   { path: '/productZone', name: 'productZone', component: productZone },
   { path: '/addProduct', name: 'addProduct', component: addProduct },
   { path: '/addCatalog', name: 'addCatalog', component: addCatalog },
-  { path: '/editProduct', name: 'editProduct', component: editProduct },
+  { path: '/editProduct/:id', name: 'editProduct', component: editProduct },
   { path: '/loginForm', name: 'loginForm', component: login },
   { path: '/registerForm', name: 'registerForm', component: register },
   { path: '/:catchAll(.*)', component: productZone },

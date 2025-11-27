@@ -16,12 +16,12 @@ export class FetchProductDto {
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === 'false')
+  @Transform(({ value }) => value === 'true')
   favorite?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'false' || value === 'true')
+  @Transform(({ value }) => value === 'true')
   createdAtASC?: boolean;
 
   @IsNumber()

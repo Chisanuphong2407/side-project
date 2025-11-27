@@ -70,7 +70,7 @@ export class ProductService {
     const limit: number = FetchProductDto.limit;
     const skip: number = FetchProductDto.skip;
     console.log('dto', FetchProductDto.createdAtASC);
-    console.log(skip);
+    // console.log(skip);
 
     if (FetchProductDto.productname && FetchProductDto.productname.length > 0) {
       condition.push({
@@ -94,15 +94,16 @@ export class ProductService {
       sort.favorite = -1;
     }
 
-    if (FetchProductDto.createdAtASC) {
-      if (FetchProductDto.createdAtASC == true) {
-        console.log('asc');
-        sort.createdAt = 1;
-      } else {
-        sort.createdAt = -1;
-      }
+    // sort.productname = 1;
+    console.log(FetchProductDto.createdAtASC);
+
+    if (FetchProductDto.createdAtASC == true) {
+      console.log('asc');
+      sort.createdAt = -1;
+    } else {
+      console.log('desc');
+      sort.createdAt = 1;
     }
-    sort.productname = 1;
     condition.push({ ownerID: FetchProductDto.ownerID });
     const pipeline = [
       {
@@ -115,6 +116,10 @@ export class ProductService {
       {
         $facet: {
           data: [
+            {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              $sort: sort,
+            },
             { $skip: skip },
             { $limit: limit },
             {
@@ -153,10 +158,6 @@ export class ProductService {
               $unwind: { path: '$unitData' },
             },
             {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              $sort: sort,
-            },
-            {
               $project: {
                 productname: '$productname',
                 description: '$description',
@@ -181,12 +182,14 @@ export class ProductService {
 
     console.log(condition);
     console.log(sort);
-    const result = await this.productModel.aggregate(pipeline).exec();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const data = result[0].data;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const count = result[0].count[0].total;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result: { data: Product[]; count: { total: number }[] }[] =
+      await this.productModel.aggregate(pipeline).exec();
+
+    const data: Product[] = result[0].data;
+
+    const count: number = result[0].count[0].total;
+
     return { data, count };
   }
 

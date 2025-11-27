@@ -36,7 +36,8 @@ import { ref } from 'vue'
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/index'
-import axios from 'axios';
+// import axios from 'axios';
+import userService from '@/api/user-service';
 
 defineOptions({
   name: 'registerForm',
@@ -48,28 +49,9 @@ const phone = ref<string>()
 const username = ref<string>()
 const password = ref<string>()
 const confirmPassword = ref<string>()
-const URL = import.meta.env.VITE_API_BASE_URL;
+// const URL = import.meta.env.VITE_API_BASE_URL;
 
 const onSubmitRegister = async (email: string, password: string) => {
-  // const data = [
-  //   firstname.value,
-  //   lastname.value,
-  //   email.value,
-  //   phone.value,
-  //   username.value,
-  //   password.value,
-  // ]
-
-  // const topic: string[] = ['firstname', 'lastname', 'email', 'phone', 'username', 'password']
-  // const registerForm = new FormData()
-
-  // data.forEach((data, index) => {
-  //   const key = (topic[index] || '').toString()
-  //   const value = (data || '').toString();
-  //   registerForm.append(key, value);
-
-  //   console.log(registerForm.get(key));
-  // })
 
   if (password !== confirmPassword.value) {
     alert("ยืนยันรหัสผ่านไม่สำเร็จ");
@@ -77,7 +59,7 @@ const onSubmitRegister = async (email: string, password: string) => {
   }
 
   try {
-    console.log(auth)
+
     //1. สร้าง account ใน firebase
     const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
 
@@ -87,7 +69,7 @@ const onSubmitRegister = async (email: string, password: string) => {
 
     await updateProfile(user, { displayName: username.value })
     console.log(user);
-    console.log(userCredential);
+    console.log('credent', userCredential);
     //user เก็บ uid ไว้
     const uid = user.uid;
 
@@ -107,7 +89,12 @@ const onSubmitRegister = async (email: string, password: string) => {
       createdAt: new Date()    // เก็บเวลาที่สมัคร
     });
 
-    await axios.post(`${URL}/user`, {
+    // await axios.post(`${URL}/user`, {
+    //   uid: uid,
+    //   username: username.value
+    // })
+
+    await userService.userRegister({
       uid: uid,
       username: username.value
     })
