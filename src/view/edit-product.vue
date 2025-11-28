@@ -4,14 +4,29 @@
     <div v-if="product">
       <form @submit.prevent="submitProduct" class="add-product-form">
         <label for="product-name">ชื่อสินค้า</label>
-        <input id="product-name" type="text" placeholder="ชื่อสินค้าของท่าน" v-model="product.productname" />
+        <input
+          id="product-name"
+          type="text"
+          placeholder="ชื่อสินค้าของท่าน"
+          v-model="product.productname"
+        />
 
         <label for="product-description">รายละเอียดสินค้า</label>
-        <input id="product-description" type="text" placeholder="ข้อมูลเกี่ยวกับสินค้าของท่าน"
-          v-model="product.description" />
+        <input
+          id="product-description"
+          type="text"
+          placeholder="ข้อมูลเกี่ยวกับสินค้าของท่าน"
+          v-model="product.description"
+        />
 
         <label for="product-quantity">จำนวนสินค้า</label>
-        <input id="product-quantity" type="number" placeholder="จำนวนสินค้า" v-model="product.quantity" min="1" />
+        <input
+          id="product-quantity"
+          type="number"
+          placeholder="จำนวนสินค้า"
+          v-model="product.quantity"
+          min="1"
+        />
 
         <label for="product-unit">หน่วย</label>
         <select id="product-unit" v-model="product.unit">
@@ -20,13 +35,24 @@
         </select>
 
         <label for="product-price">ราคา (บาท)</label>
-        <input id="product-price" type="number" placeholder="ราคาสินค้า (บาท)" v-model="product.price" />
+        <input
+          id="product-price"
+          type="number"
+          placeholder="ราคาสินค้า (บาท)"
+          v-model="product.price"
+        />
 
         <div class="img">
           <label for="product-image">รูปภาพ</label>
           <img v-if="previewPath" :src="previewPath" alt="Image Preview" class="image-preview" />
 
-          <input id="product-image" type="file" ref="fileInput" @change="fileHandle" accept="image/*" />
+          <input
+            id="product-image"
+            type="file"
+            ref="fileInput"
+            @change="fileHandle"
+            accept="image/*"
+          />
         </div>
 
         <label for="product-unit">หมวดหมู่</label>
@@ -57,14 +83,14 @@ import unitService from '@/api/unit-service'
 
 // กำหนดชื่อ Component (Optional: จำเป็นถ้าใช้ KeepAlive หรืออยากเห็นชื่อใน DevTools)
 defineOptions({
-  name: 'editProduct'
+  name: 'editProduct',
 })
 
 const router = useRouter()
-const route = useRoute();
-const uidStore = useUserUIDStore();
-const uid = <string>uidStore.currentUid;
-const productID: string = <string>route.query.productID;
+const route = useRoute()
+const uidStore = useUserUIDStore()
+const uid: string | undefined = uidStore.currentUid?.toString()
+const productID: string | undefined = route?.query?.productID?.toString()
 // State
 const product = ref()
 
@@ -81,21 +107,20 @@ const photoOBJ = ref()
 onMounted(async () => {
   console.log(productID)
   try {
-    const productData = await productService.getProduct(productID)
-    product.value = productData.data;
+    const productData = await productService.getProduct(productID || '')
+    product.value = productData.data
     console.log(product.value)
 
-    const catalogData = await catalogService.allCatalog(uid);
-    allCatalog.value = catalogData.data;
+    const catalogData = await catalogService.allCatalog(uid || '')
+    allCatalog.value = catalogData.data
 
-    const unitData = await unitService.allUnit(uid);
-    allUnit.value = unitData.data;
+    const unitData = await unitService.allUnit(uid || '')
+    allUnit.value = unitData.data
 
-    console.log(productID);
-    const userRef = doc(db, 'ProductPic', productID);
+    console.log(productID)
+    const userRef = doc(db, 'ProductPic', productID || '')
 
-    const docSnap = await getDoc(userRef);
-
+    const docSnap = await getDoc(userRef)
 
     if (docSnap.exists()) {
       // console.log("ข้อมูลที่ได้:", docSnap.data().path.base64);
@@ -124,37 +149,41 @@ const removeImage = () => {
 //แปลงไฟล์เป็น base64
 const compressIMG = (file: File, quality = 0.7, maxWidth = 800): Promise<Blob> => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader(); //สร้างตัวอ่านไฟล์
-    reader.readAsDataURL(file); // อ่านไฟล์
+    const reader = new FileReader() //สร้างตัวอ่านไฟล์
+    reader.readAsDataURL(file) // อ่านไฟล์
     reader.onload = (event) => {
-      const img = new Image();
+      const img = new Image()
       //สร้าง canvas เพื่อวาดรูปขึ้นใหม่
-      img.src = event.target?.result as string;
+      img.src = event.target?.result as string
       img.onload = () => {
         const canvas = document.createElement('canvas')
-        let width = img.width;
-        let height = img.height;
+        let width = img.width
+        let height = img.height
 
         //คำนวณขนาดใหม่
         if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
+          height = Math.round((height * maxWidth) / width)
           width = maxWidth
         }
         canvas.width = width
         canvas.height = height
 
         //วาดรูปลง canvas
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0, width, height)
 
         //แปลงเป็น blob พร้อมลดคุณภาพ
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error("compression failed"));
-        }, 'image/jpeg', quality); // quality 0.7 คือชัด 70% (ขนาดลดลงเยอะมาก)
-      };
-      img.onerror = (err) => reject(err);
-    };
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob)
+            else reject(new Error('compression failed'))
+          },
+          'image/jpeg',
+          quality,
+        ) // quality 0.7 คือชัด 70% (ขนาดลดลงเยอะมาก)
+      }
+      img.onerror = (err) => reject(err)
+    }
     reader.onerror = (err) => reject(err)
   })
 }
@@ -162,12 +191,12 @@ const compressIMG = (file: File, quality = 0.7, maxWidth = 800): Promise<Blob> =
 //convert IMG
 const convertIMGtobase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
 
-    reader.onload = () => resolve(reader.result as string);
+    reader.onload = () => resolve(reader.result as string)
 
-    reader.onerror = (err) => reject(err);
+    reader.onerror = (err) => reject(err)
   })
 }
 
@@ -182,18 +211,18 @@ const fileHandle = async (event: Event) => {
     try {
       // 1. สั่งย่อรูปก่อน (เหลือความกว้าง 800px, คุณภาพ 70%)
       // ต่อให้รูปมา 10MB ก็จะเหลือแค่หลักร้อย KB
-      const compressBlob = await compressIMG(file, 0.7, 800);
-      console.log("ขนาดหลังย่อ:", compressBlob.size / 1024, "KB");
+      const compressBlob = await compressIMG(file, 0.7, 800)
+      console.log('ขนาดหลังย่อ:', compressBlob.size / 1024, 'KB')
 
       // 2. แปลง Blob กลับเป็น File (เพื่อให้โค้ดส่วนอื่นทำงานต่อได้เหมือนเดิม)
       const compressFile = new File([compressBlob], file.name, {
         type: 'image/jpeg',
         lastModified: Date.now(),
-      });
+      })
 
       // 3. ทำงานต่อตามปกติ แปลงไฟล์เป็น base64
-      selectFile.value = compressFile;
-      previewPath.value = await convertIMGtobase64(compressFile);
+      selectFile.value = compressFile
+      previewPath.value = await convertIMGtobase64(compressFile)
 
       photoOBJ.value = {
         base64: previewPath.value,
@@ -203,7 +232,7 @@ const fileHandle = async (event: Event) => {
       }
       console.log('photo', photoOBJ)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   } else {
     removeImage()
@@ -219,11 +248,11 @@ const submitProduct = async () => {
 
   const raw = unref(product)
   const sendData = toRaw(raw)
-  console.log(sendData);
+  console.log(sendData)
 
   try {
-    await productService.editProduct(productID, sendData)
-    const imageRef = doc(db, "ProductPic", productID || '');
+    await productService.editProduct(productID || '', sendData)
+    const imageRef = doc(db, 'ProductPic', productID || '')
 
     console.log('photo', photoOBJ.value)
     await setDoc(imageRef, {
@@ -231,7 +260,7 @@ const submitProduct = async () => {
       path: photoOBJ.value,
     })
     isloading.value = false
-    router.push('/');
+    router.push('/')
     alert('อัพเดตสำเร็จ')
   } catch (error) {
     alert(error)
