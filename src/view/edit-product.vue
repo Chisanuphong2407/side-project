@@ -64,7 +64,7 @@ const router = useRouter()
 const route = useRoute();
 const uidStore = useUserUIDStore();
 const uid = <string>uidStore.currentUid;
-const productID: string = <string>route.params.id;
+const productID: string = <string>route.query.productID;
 // State
 const product = ref()
 

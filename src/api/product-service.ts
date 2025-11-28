@@ -35,6 +35,6 @@ export default {
   },
 
   getProduct(id: string){
-    return apiClient.get(`/product/get/${id}`);
+    return apiClient.get(`/product/get?_id=${id}`);
   },
 }
