@@ -39,7 +39,7 @@ const onAuth = () => {
       isLogin.value = true
       userStore.setUsername(<string>user.displayName)
       userUidStore.setUid(user.uid)
-      router.replace('/product');
+      // router.replace('/product');
     } else {
       console.log("else+++++++++++++++++++++")
       isLogin.value = false

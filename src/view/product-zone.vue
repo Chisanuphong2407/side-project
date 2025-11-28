@@ -232,7 +232,12 @@ const selectedItem = (product: string) => {
 
 const editProduct = (product: string) => {
   productStore.setProductID(product)
-  router.push(`/editProduct/${product}`)
+  router.push({
+    path: '/editProduct',
+    query: {
+      productID: product,
+    }
+  })
 }
 
 const deleteProduct = async (product: string) => {
