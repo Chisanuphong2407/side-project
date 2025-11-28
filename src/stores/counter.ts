@@ -11,24 +11,6 @@ export const useCounterStore = defineStore('counter', () => {
   return { count, doubleCount, increment }
 })
 
-export const useProductIDStore = defineStore('id', () => {
-  const currentProductID = ref<string>()
-
-  const setProductID = (id: string) => {
-    currentProductID.value = id
-  }
-
-  const resetProductID = () => {
-    currentProductID.value = ''
-  }
-
-  return {
-    currentProductID,
-    setProductID,
-    resetProductID,
-  }
-})
-
 export const useUserUIDStore = defineStore('uid', () => {
   const currentUid = ref<string>()
 

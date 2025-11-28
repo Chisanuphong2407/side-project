@@ -1,4 +1,4 @@
-import apiClient from './axios-client'
+import { apiClient } from './axios-client'
 
 export default {
   allUnit(user: string) {

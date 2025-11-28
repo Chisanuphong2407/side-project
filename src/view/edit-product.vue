@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, toRaw, unref } from 'vue'
-import { useUserUIDStore } from '@/stores/counter'
+import { useUserUIDStore } from '@/stores/useUserUIDStore'
 import { useRouter, useRoute } from 'vue-router'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase'

@@ -1,9 +1,8 @@
 <template>
-  <router-view class="content"/>
+  <router-view class="content" />
 </template>
 
-<script lang="ts" setup>
-</script>
+<script lang="ts" setup></script>
 
 <style>
 .content {

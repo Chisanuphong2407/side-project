@@ -1,4 +1,4 @@
-import apiClient from './axios-client'
+import { apiClient } from './axios-client'
 
 export default {
   searchProduct(
@@ -34,7 +34,7 @@ export default {
     return apiClient.patch(`/product/favorite/${id}`)
   },
 
-  getProduct(id: string){
-    return apiClient.get(`/product/get?_id=${id}`);
+  getProduct(id: string) {
+    return apiClient.get(`/product/get?_id=${id}`)
   },
 }

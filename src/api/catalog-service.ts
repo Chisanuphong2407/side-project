@@ -1,4 +1,4 @@
-import apiClient from './axios-client'
+import { apiClient } from './axios-client'
 
 export default {
   allCatalog(user: string) {
@@ -6,6 +6,6 @@ export default {
   },
 
   addCatalog(data: object) {
-    return apiClient.post(`/catalog`, data);
+    return apiClient.post(`/catalog`, data)
   },
 }
