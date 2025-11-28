@@ -1,15 +1,15 @@
-  <template>
-    <div>
-      <div class="container" v-if="isLogin">
-        <productHeader class="header" />
-        <navigator class="nav" />
-        <content class="content" />
-      </div>
-      <div v-else>
-        <content />
-      </div>
+<template>
+  <div>
+    <div class="container" v-if="isLogin">
+      <productHeader class="header" />
+      <navigator class="nav" />
+      <content class="content" />
     </div>
-  </template>
+    <div v-else>
+      <content />
+    </div>
+  </div>
+</template>
 
 <script lang="ts" setup>
 import productHeader from './components/product-header.vue'
@@ -19,15 +19,19 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
-import { useUserNameStore, useUserUIDStore } from './stores/counter'
+import { useUserUIDStore } from './stores/useUserUIDStore'
+import { useUserNameStore } from './stores/useUserNameStore'
+import { useRoute } from 'vue-router'
+// import {  } from './stores/useUserUIDStore'
 
 const router = useRouter()
-const isLogin = ref<boolean>(false);
+const route = useRoute()
+const isLogin = ref<boolean>(false)
 const userStore = useUserNameStore()
 const userUidStore = useUserUIDStore()
 
 onMounted(() => {
-  onAuth();
+  onAuth()
 })
 
 const onAuth = () => {
@@ -39,15 +43,19 @@ const onAuth = () => {
       isLogin.value = true
       userStore.setUsername(<string>user.displayName)
       userUidStore.setUid(user.uid)
-      // router.replace('/product');
+      const path = route.path
+      console.log('path', path)
+
+      if (path === '/loginForm') {
+        router.replace('/product')
+      }
     } else {
-      console.log("else+++++++++++++++++++++")
+      console.log('else+++++++++++++++++++++')
       isLogin.value = false
-      router.replace('/loginForm');
+      router.replace('/loginForm')
     }
   })
 }
-
 </script>
 
 <style scoped>
@@ -60,7 +68,7 @@ const onAuth = () => {
   grid-template-areas:
     'header header'
     'nav main';
-    user-select: none;
+  user-select: none;
 }
 
 .header {

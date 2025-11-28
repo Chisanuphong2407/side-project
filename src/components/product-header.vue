@@ -13,11 +13,13 @@
 <script lang="ts" setup>
 import { signOut } from 'firebase/auth'
 import { auth } from '@/firebase'
-import { useUserNameStore } from '@/stores/counter'
+import { useUserNameStore } from '@/stores/useUserNameStore'
+import { useUserUIDStore } from '@/stores/useUserUIDStore'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 
 const userStore = useUserNameStore();
+const uidStore = useUserUIDStore();
 const router = useRouter();
 
 const logout = async() => {
@@ -25,7 +27,8 @@ const logout = async() => {
     await signOut(auth).then(() => {
       console.log("logout!!!")
     })
-    userStore.setUsername('')
+    userStore.$reset();
+    uidStore.$reset();
   } catch (error) {
     console.log('logout error', error)
   }

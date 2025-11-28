@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useUserUIDStore } from '@/stores/counter'
+import { useUserUIDStore } from '@/stores/useUserUIDStore'
 import catalogService from '@/api/catalog-service'
 import unitService from '@/api/unit-service'
 
